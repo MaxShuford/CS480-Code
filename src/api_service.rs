@@ -1,4 +1,4 @@
-use base65::{Engine as _, engine::general_purpose};
+use base64::{Engine as _, engine::general_purpose};
 use curl::easy::Easy;
 use image::load_from_memory;
 use regex::Regex;
