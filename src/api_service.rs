@@ -1,12 +1,17 @@
+use base65::{Engine as _, engine::general_purpose};
 use curl::easy::Easy;
+use image::load_from_memory;
 use regex::Regex;
 use serde::Deserialize;
 use serde_json;
+use std::fs::File;
 use std::sync::{Arc, Mutex};
+
+use crate::structs::RouteToMap;
 
 // TODO: Real errors instead of expect then change return type to result
 
-fn api_call(api_call_str: &str) -> String {
+fn api_call(api_call_str: &str) -> Vec<u8> {
     // Arc::Mutex allows us to clone out vec and use it in a closure for the write_function
     let out = Arc::new(Mutex::new(Vec::new()));
     let out_closure = out.clone();
@@ -29,7 +34,7 @@ fn api_call(api_call_str: &str) -> String {
 
     let result = out.lock().expect("Unable to lock output");
 
-    String::from_utf8(result.clone()).expect("Did not receive valid UTF-8")
+    result.clone()
 }
 
 pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> (f32, f32) {
@@ -42,6 +47,7 @@ pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> (f32, f32)
     );
 
     let result_str = self::api_call(api_call_str.as_str());
+    let result_str = String::from_utf8(result_str).expect("Did not receive valid UTF-8");
 
     if result_str.len() == 2 {
         println!("Invalid location")
@@ -85,7 +91,8 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> DirectionOptions
     );
 
     // execute directions api call
-    let result_str = api_call(api_call_str.as_str());
+    let result_vec = api_call(api_call_str.as_str());
+    let result_str = String::from_utf8(result_vec).expect("Did not receive valid UTF-8");
 
     // parsing result json
     let result: APIResult =
@@ -113,6 +120,52 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> DirectionOptions
         code: result.code,
         routes: routes,
     }
+}
+
+pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) {
+    // get bounding box
+
+    // build str for markers
+    let mut markers = String::new();
+    for waypoint in &routes[0].route.wp {
+        let label = match waypoint.name.as_str().chars().next() {
+            Some(ch) => ch,
+            None => 'l',
+        };
+
+        let temp = format!(
+            "pin-s-{}+000({},{}),",
+            label, waypoint.longitude, waypoint.latitude
+        );
+        markers.push_str(temp.as_str());
+    }
+
+    // build str for paths
+    let mut geo_paths = String::new();
+    for i in 0..routes.len() - 1 {
+        let temp = format!("path({}),", routes[i].geometry);
+        geo_paths.push_str(temp.as_str());
+    }
+    let temp = format!("path({})", routes[routes.len() - 1].geometry);
+    geo_paths.push_str(temp.as_str());
+
+    // TODO: add route polylines and waypoints markers to api call
+    let api_call_str = format!(
+        "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{markers}{geo_paths}/auto/400x400?access_token={api_key}"
+    );
+    let api_result = api_call(api_call_str.as_str());
+
+    // NOTE: TEMP
+    let img = load_from_memory(&api_result).expect("Failed to load image from mem");
+    let mut file = File::create("mapbox_result.png").expect("Failed to create file");
+    img.write_to(&mut file, image::ImageFormat::Png)
+        .expect("Failed to write img to file");
+    // NOTE: END TEMP
+
+    let base64_encoded_image = general_purpose::STANDARD.encode(&api_result);
+    println!("{}", base64_encoded_image);
+
+    // TODO: structure return
 }
 
 pub struct DirectionOptions {
