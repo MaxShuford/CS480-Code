@@ -128,11 +128,10 @@ pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) {
     // build str for markers
     let mut markers = String::new();
     for waypoint in &routes[0].route.wp {
-        let label = match waypoint.name.as_str().chars().next() {
+        let label = match (waypoint.id + 1).to_string().chars().next() {
             Some(ch) => ch,
-            None => 'l',
+            None => '0',
         };
-
         let temp = format!(
             "pin-s-{}+000({},{}),",
             label, waypoint.longitude, waypoint.latitude
