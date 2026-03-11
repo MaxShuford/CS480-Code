@@ -1,0 +1,14 @@
+h1{
+    font-size: 50px;
+    text-align: center;
+}
+
+#title{
+    float: left;
+    width: 70%;
+}
+
+#profileIcon{
+    float: right;
+    width: 30%;
+}

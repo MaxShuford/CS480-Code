@@ -1,0 +1,67 @@
+section{
+    width: 70%;
+    float:left;
+    display: flex;
+}
+
+aside{
+    float: right;
+    width: 30%;
+    padding: 20px 0px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+}
+
+form{
+    width:100%
+}
+
+.cityBox{
+    height: 30px;
+    width: 300px;
+    float: left;
+
+    background-image: url("images/SearchIcon.png");
+    background-size: 30px auto;
+    background-repeat: no-repeat;
+    padding-left: 30px;
+}
+
+.arrow{
+    height: 30px;
+    width: 30px;
+    transform: rotate(-90deg);
+    margin: .5em 0;
+    margin-right: 27%;
+}
+
+.buttons{
+    height: 30px;
+    width: 200px;
+    margin-left: 25%;
+}
+
+#theMap{
+    height: 800px;
+    width: 1000px;
+    border: 5px solid black;
+
+}
+
+#wayAdd{
+    width: 30px;
+    height: inherit;
+    float: left;
+    margin-left: 1em;
+    margin-top: 3px;
+}
+
+#endTextbox{
+    margin-bottom: 2em;
+    height: 30px;
+}
