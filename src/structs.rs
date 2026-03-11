@@ -46,3 +46,9 @@ pub struct Favorite {
     pub uuid: i64,
     pub route_id: i32,
 }
+
+#[derive(Debug, Clone)]
+pub struct RouteToMap {
+    pub route: Route,
+    pub geometry: String,
+}
