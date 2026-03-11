@@ -41,6 +41,8 @@ pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> (f32, f32)
     // TODO: Error checking on api key, city name, and state code lengths (must be < 1) this might
     // be done in controller?
 
+    let city_name = city_name.replace(" ", "+");
+
     // constuct
     let api_call_str = format!(
         "http://api.openweathermap.org/geo/1.0/direct?q={city_name},{state_code},us&limit=1&appid={api_key}"
@@ -123,34 +125,51 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> DirectionOptions
 }
 
 pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) {
-    // get bounding box
+    // build str for paths
+    let mut geo_paths = String::new();
+    for i in 0..routes.len() {
+        let hex_color = match i {
+            0 => "+00f",
+            1 => "+800",
+            2 => "+f00",
+            _ => "",
+        };
+        let temp = format!("path{hex_color}({}),", routes[i].geometry);
+        geo_paths.push_str(temp.as_str());
+    }
 
     // build str for markers
     let mut markers = String::new();
-    for waypoint in &routes[0].route.wp {
-        let label = match (waypoint.id + 1).to_string().chars().next() {
+    for i in 0..routes[0].route.wp.len() - 1 {
+        let label = match (routes[0].route.wp[i].id + 1).to_string().chars().next() {
             Some(ch) => ch,
             None => '0',
         };
         let temp = format!(
-            "pin-s-{}+000({},{}),",
-            label, waypoint.longitude, waypoint.latitude
+            "pin-s-{}+ff0({},{}),",
+            label, routes[0].route.wp[i].longitude, routes[0].route.wp[i].latitude
         );
         markers.push_str(temp.as_str());
     }
-
-    // build str for paths
-    let mut geo_paths = String::new();
-    for i in 0..routes.len() - 1 {
-        let temp = format!("path({}),", routes[i].geometry);
-        geo_paths.push_str(temp.as_str());
-    }
-    let temp = format!("path({})", routes[routes.len() - 1].geometry);
-    geo_paths.push_str(temp.as_str());
+    let label = match (routes[0].route.wp[routes[0].route.wp.len() - 1].id + 1)
+        .to_string()
+        .chars()
+        .next()
+    {
+        Some(ch) => ch,
+        None => '0',
+    };
+    let temp = format!(
+        "pin-s-{}+ff0({},{})",
+        label,
+        routes[0].route.wp[routes[0].route.wp.len() - 1].longitude,
+        routes[0].route.wp[routes[0].route.wp.len() - 1].latitude
+    );
+    markers.push_str(temp.as_str());
 
     // TODO: add route polylines and waypoints markers to api call
     let api_call_str = format!(
-        "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{markers}{geo_paths}/auto/400x400?access_token={api_key}"
+        "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{geo_paths}{markers}/auto/400x400?access_token={api_key}"
     );
     let api_result = api_call(api_call_str.as_str());
 
