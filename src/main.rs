@@ -411,9 +411,9 @@ fn handle_request(
             let location: structs::UserEnteredLocation =
                 serde_json::from_str(body_content).expect("invalid location json file");
             let response = match api_service::geocoding(
+                api_keys.geocoding.as_str(),
                 location.city.as_str().to_lowercase().trim(),
                 location.state.as_str().to_lowercase().trim(),
-                api_keys.geocoding.as_str(),
             ) {
                 Ok((lat, lon)) => {
                     let wp_name = format!("{}, {}", location.city, location.state);
