@@ -247,7 +247,6 @@ fn route_request(method: &str, path: &str) {
 }
 
 fn main() {
-    // TODO: read api keys from a config file
     let api_keys = fs::read_to_string("api_keys.txt").expect("Unable to read api_keys");
     let mut lines = api_keys.lines();
     let geocoding = lines.next().unwrap_or("");
@@ -407,8 +406,7 @@ fn handle_request(
                 ("HTTP/1.1 200 Ok", "text/css", contents)
             }
         }
-        // TODO: geocoding api handle
-        "POST /locationData" => {
+        "POST /locationData HTTP/1.1" => {
             // I have city name, state code in a json
             let location: structs::UserEnteredLocation =
                 serde_json::from_str(body_content).expect("invalid location json file");
@@ -428,10 +426,10 @@ fn handle_request(
                     (
                         "HTTP/1.1 200 Ok",
                         "application/json",
-                        serde_json::to_string(&wp).expect("Incorrect lat and lon"),
+                        serde_json::to_string(&wp).expect("Invalid lat and lon struct"),
                     )
                 }
-                Err(e) => (
+                Err(_) => (
                     "HTTP/1.1 400 Bad Request",
                     "text/plain",
                     String::from("Invalid location"),
@@ -440,7 +438,29 @@ fn handle_request(
 
             response
         }
-        // TODO: directions api handle
+        "POST /directions HTTP/1.1" => {
+            let waypoints: Vec<structs::Waypoint> =
+                serde_json::from_str(body_content).expect("invalid waypoint json file");
+            let waypoints: Vec<(f32, f32)> = waypoints
+                .iter()
+                .map(|s| (s.latitude as f32, s.longitude as f32))
+                .collect();
+
+            let response = match api_service::directions(api_keys.mapbox.as_str(), waypoints) {
+                Ok(routes) => (
+                    "HTTP/1.1 200 Ok",
+                    "application/json",
+                    serde_json::to_string(&routes).expect("Invalid route object"),
+                ),
+                Err(_) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    String::from("Unable to route"),
+                ),
+            };
+
+            response
+        }
         // TODO: static map with routes handle
         // TODO: static map with user location handle
         // TODO: login handle
