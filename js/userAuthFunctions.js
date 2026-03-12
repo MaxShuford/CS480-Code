@@ -162,7 +162,6 @@ function changePassword(user, oldPassword, newPassword)
     .catch((error) => {
     console.error('Error:', error);
     });
-
 }
 
 /*
@@ -194,9 +193,6 @@ function createAccount(username, password)
     });
 
     localStorage.setItem('username', username);
-    hashString(password).then(hashedPassword => {
-        localStorage.setItem('password', hashedPassword);
-    });
 }
 
 /*

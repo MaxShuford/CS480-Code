@@ -29,10 +29,14 @@ const getRoutes = () => {
     if(validStart || validEnd){
         alert('INVALID FORMAT');
     }
+    else if(!validStart && !validEnd)
+    {
+        numOfWaypoints = 2;
+    }
 
     if(numOfWaypoints > 0){
         const allWaypoints =  document.querySelectorAll(".waypoints");
-
+        let waypointOBJ;
         for(let i = 0; i < allWaypoints.length; i++){
 
             //get current waypoint value
@@ -44,6 +48,7 @@ const getRoutes = () => {
                 break;
             }
             
+            //get lat and long for waypoint
             wpSplit = wpCity.split(",");
             const postData = {city:wpSplit[0], state:wpSplit[1]};
             fetch('/locationData', {
@@ -56,16 +61,33 @@ const getRoutes = () => {
             .then(response => response.json())
             .then(data => {
             console.log('Success:', data);
-            locationData = JSON.parse(data)
+            locationData = JSON.parse(data);
+                waypointOBJ[i] = {"waypoint_num":i, "name": wpCity, "lat": locationData.lat, "long": locationData.long}
             })
             .catch((error) => {
             console.error('Error:', error);
             });
-
         }
+
+        //get the directions for the routes
+        const postData = {"waypoints": waypointOBJ};
+            fetch('/directions', {
+            method: 'POST', // Specify the method
+            headers: {
+                'Content-Type': 'application/json', // Inform the server the body is JSON
+            },
+            body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+            })
+            .then(response => response.json())
+            .then(data => {
+            console.log('Success:', data);
+            routes = JSON.parse(data);
+            localStorage.setItem(routes);
+            })
+            .catch((error) => {
+            console.error('Error:', error);
+            });
     }
-
-
 }
 
 
