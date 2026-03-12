@@ -59,43 +59,142 @@ fn extract_file_name(request_line: &str) -> Option<(String, String)> {
 }
 
 // === API Handlers ===
-fn handle_login() {
+fn handle_login(request_body : &str) -> String {
     println!("POST /login");
-    // TODO: parse {username, password}, return {uuid}
+    
+    let login: LoginRequest = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::login(login) {
+        Ok(uuid) => formats!("uuid: {}", uuid),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+    
+    response;
 }
 
-fn handle_create_account() {
+fn handle_create_account(request_body : &str) -> String {
     println!("POST /createAccount");
-    // TODO: parse {username, password, confirmPassword}, return {error_code}
+
+    let create: User = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::create_acct(create) {
+        Ok(code) => formats!("Success: {}", code),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+    
+    response
 }
 
-fn handle_change_password() {
+fn handle_change_password(request_body : &str) -> String {
     println!("POST /changePassword");
+
+    let hcp: ChangePassword = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::change_password(hcp) {
+        Ok(code) => formats!("Success: {}", code),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+    
+    response
     // TODO: parse {uuid, oldPassword, newPassword, confirmPassword}, return {error_code}
 }
 
-fn handle_add_favorite() {
+fn handle_add_favorite(request_body : &str) -> String {
     println!("POST /addFavorite");
+
+    let addfave: AddFavorite = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::add_favorite(addfave) {
+        Ok(code) => formats!("Success: {}", code),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+    
+    response
     // TODO: parse {uuid, route}, return {error_code}
 }
 
-fn handle_delete_favorite() {
+fn handle_delete_favorite(request_body : &str) -> String {
     println!("POST /deleteFavorite");
+
+    let delfave: DeleteFavorite = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::delete_favorite(delfave) {
+        Ok(code) => formats!("Success: {}", code),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+    
+    response
     // TODO: parse {uuid, route_id}, return {error_code}
 }
 
-fn handle_retrieve_favorites() {
+fn handle_retrieve_favorites(request_body : &str) -> String {
     println!("POST /retrieveFavorites");
+
+    let retfave: RetrieveFavorites = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    match DB::retrieve_favorite(retfave) {
+        Ok(favorites) => {
+            let route_ids: Vec<i32> = favorites.iter().map(|f| f.route_id).collect();
+            let names: Vec<String> = favorites.iter().map(|f| f.name.clone()).collect();
+
+            format!("{{\"route_id\": {:?}, \"names\": {:?}}}", route_ids, names)
+        }
+        Err(e) => format!("Err processing request: {}", e),
+    }
     // TODO: parse {uuid}, return {route_id: [], names: []}
 }
 
-fn handle_retrieve_favorite() {
+fn handle_retrieve_favorite(request_body : &str) -> String {
     println!("POST /retrieveFavorite");
+
+    let retfave: RetrieveFavorites = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::retrieve_favorite(retfave) {
+        Ok(route) => format!("Success: {:?}", route), // return route
+        Err(e) => format!("Err processing request: {}", e),
+    };
     // TODO: parse {uuid, route_id}, return {route: Route}
 }
 
 fn handle_404() {
     println!("404 Not Found");
+
+    "404 Not Found".to_string()
 }
 
 // === Router ===
