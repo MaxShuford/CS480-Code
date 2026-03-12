@@ -4,14 +4,16 @@ use image::load_from_memory;
 use regex::Regex;
 use serde::Deserialize;
 use serde_json;
+
 use std::fs::File;
 use std::sync::{Arc, Mutex};
 
-use crate::structs::RouteToMap;
+use crate::error::{Error, Result};
+use crate::structs::{DirectionOptions, RouteToMap, RouteWithDirections};
 
 // TODO: Real errors instead of expect then change return type to result
 
-fn api_call(api_call_str: &str) -> Vec<u8> {
+fn api_call(api_call_str: &str) -> Result<Vec<u8>> {
     // Arc::Mutex allows us to clone out vec and use it in a closure for the write_function
     let out = Arc::new(Mutex::new(Vec::new()));
     let out_closure = out.clone();
@@ -34,13 +36,10 @@ fn api_call(api_call_str: &str) -> Vec<u8> {
 
     let result = out.lock().expect("Unable to lock output");
 
-    result.clone()
+    Ok(result.clone())
 }
 
-pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> (f32, f32) {
-    // TODO: Error checking on api key, city name, and state code lengths (must be < 1) this might
-    // be done in controller?
-
+pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> Result<(f32, f32)> {
     let city_name = city_name.replace(" ", "+");
 
     // constuct
@@ -48,11 +47,11 @@ pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> (f32, f32)
         "http://api.openweathermap.org/geo/1.0/direct?q={city_name},{state_code},us&limit=1&appid={api_key}"
     );
 
-    let result_str = self::api_call(api_call_str.as_str());
+    let result_str = self::api_call(api_call_str.as_str())?;
     let result_str = String::from_utf8(result_str).expect("Did not receive valid UTF-8");
 
     if result_str.len() == 2 {
-        println!("Invalid location")
+        return Err(Error::InvalidLocation);
     }
 
     // String parsing for lat
@@ -79,10 +78,10 @@ pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> (f32, f32)
         .parse::<f32>()
         .expect("Failed to parse longitude as f32");
 
-    (lat, lon)
+    Ok((lat, lon))
 }
 
-pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> DirectionOptions {
+pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> Result<DirectionOptions> {
     // construct api call
     let mut loc_str = format!("{},{}", locations[0].1, locations[0].0);
     for i in 1..(locations.len()) {
@@ -93,7 +92,7 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> DirectionOptions
     );
 
     // execute directions api call
-    let result_vec = api_call(api_call_str.as_str());
+    let result_vec = api_call(api_call_str.as_str())?;
     let result_str = String::from_utf8(result_vec).expect("Did not receive valid UTF-8");
 
     // parsing result json
@@ -118,13 +117,13 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> DirectionOptions
     }
 
     // return DirectionsResult
-    DirectionOptions {
+    Ok(DirectionOptions {
         code: result.code,
         routes: routes,
-    }
+    })
 }
 
-pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) {
+pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) -> Result<String> {
     // build str for paths
     let mut geo_paths = String::new();
     for i in 0..routes.len() {
@@ -171,7 +170,7 @@ pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) {
     let api_call_str = format!(
         "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{geo_paths}{markers}/auto/400x400?access_token={api_key}"
     );
-    let api_result = api_call(api_call_str.as_str());
+    let api_result = api_call(api_call_str.as_str())?;
 
     // NOTE: TEMP
     let img = load_from_memory(&api_result).expect("Failed to load image from mem");
@@ -180,21 +179,7 @@ pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) {
         .expect("Failed to write img to file");
     // NOTE: END TEMP
 
-    let base64_encoded_image = general_purpose::STANDARD.encode(&api_result);
-    println!("{}", base64_encoded_image);
-
-    // TODO: structure return
-}
-
-pub struct DirectionOptions {
-    pub code: String,
-    pub routes: Vec<RouteWithDirections>,
-}
-
-pub struct RouteWithDirections {
-    pub waypoints: Vec<(f32, f32)>,
-    pub directions: Vec<String>,
-    pub geometry: String,
+    Ok(general_purpose::STANDARD.encode(&api_result))
 }
 
 // structs for deserialing response from
