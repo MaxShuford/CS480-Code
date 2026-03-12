@@ -247,7 +247,7 @@ fn main() {
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
-        parse_stream(stream);
+        handle_stream(stream);
     }
 
     route_request("GET", "/html/Login.html");
@@ -262,7 +262,7 @@ fn main() {
     if let Some(file) = extract_file_name(raw) {}
 }
 
-fn parse_stream(mut stream: TcpStream) {
+fn handle_stream(mut stream: TcpStream) {
     let mut reader = BufReader::new(&mut stream);
 
     // read request line
@@ -298,21 +298,106 @@ fn parse_stream(mut stream: TcpStream) {
     }
 
     // read the body
+    let mut body_content = String::new();
     if content_length > 0 {
         let mut body = vec![0; content_length];
         reader.read_exact(&mut body).unwrap();
-        println!("=== Body ===\n{}", String::from_utf8_lossy(&body));
+        let body = String::from_utf8_lossy(&body);
+        body_content.push_str(body.as_ref());
+        println!("=== Body ===\n{}", body_content);
     } else {
         println!("=== No Body ===");
     }
 
-    let contents = fs::read_to_string("html/Login.html").unwrap();
-    let length = contents.len();
+    let (status_line, content_type, response_body) =
+        handle_request(request_line.as_str(), body_content.as_str());
+
+    let length = response_body.len();
     let response = format! {
-        "HTTP/1.1 200 OK\r\n
-        Content-Length: {length}\r\n\r\n\
-        {contents}"
+        "HTTP/1.1 {status_line}
+    Content-Length: {length}\r\n\r\n\
+    {response_body}"
     };
+    println!("{response}");
 
     stream.write_all(response.as_bytes()).unwrap();
+}
+
+fn handle_request(request_line: &str, body_content: &str) -> (String, String, String) {
+    let (request_code, file_name) = match extract_file_name(request_line) {
+        Some((file_type, file_name)) => (format!("GET /{file_type}"), file_name),
+        None => (String::from(request_line), String::from("")),
+    };
+
+    let (status_code, content_type, body) = match request_code.as_str() {
+        GET_LANDING_PAGE => {
+            let contents = file_retrieve("html", "Login.html");
+            if contents.as_str() == "File not Found" {
+                (
+                    "HTTP/1.1 404 Not Found",
+                    "text/plain",
+                    "Not Found.".to_string(),
+                )
+            } else {
+                ("HTTP/1.1 200 Ok", "text/html", contents)
+            }
+        }
+        GET_HTML_PAGE => {
+            let contents = file_retrieve("html", file_name.as_str());
+            if contents.as_str() == "File not Found" {
+                (
+                    "HTTP/1.1 404 Not Found",
+                    "text/plain",
+                    "Not Found.".to_string(),
+                )
+            } else {
+                ("HTTP/1.1 200 Ok", "text/html", contents)
+            }
+        }
+        GET_JS_PAGE => {
+            let contents = file_retrieve("js", file_name.as_str());
+            if contents.as_str() == "File not Found" {
+                (
+                    "HTTP/1.1 404 Not Found",
+                    "text/plain",
+                    "Not Found.".to_string(),
+                )
+            } else {
+                (
+                    "HTTP/1.1 200 Ok",
+                    "text/javascript; charset=utf-8",
+                    contents,
+                )
+            }
+        }
+        GET_CSS_PAGE => {
+            let contents = file_retrieve("css", file_name.as_str());
+            if contents.as_str() == "File not Found" {
+                (
+                    "HTTP/1.1 404 Not Found",
+                    "text/plain",
+                    "Not Found.".to_string(),
+                )
+            } else {
+                ("HTTP/1.1 200 Ok", "text/css", contents)
+            }
+        }
+        _ => (
+            "HTTP/1.1 404 Not Found",
+            "text/plain",
+            "Not Found.".to_string(),
+        ),
+    };
+
+    (String::from(status_code), String::from(content_type), body)
+}
+
+fn file_retrieve(file_type: &str, filename: &str) -> String {
+    let path = format!("{file_type}/{filename}");
+    let contents = match fs::read_to_string(path) {
+        Ok(str) => str,
+        Err(_) => String::from("File not Found"),
+    };
+
+    contents
 }

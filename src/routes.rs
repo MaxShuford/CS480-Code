@@ -15,6 +15,7 @@ pub const GET_SELECT_ROUTE_PAGE: &str = "GET /html/SelectRoute.html";
 pub const GET_VIEW_ROUTE_PAGE: &str = "GET /html/ViewRoute.html";
 
 // == Page Type Requests (GET)
+pub const GET_LANDING_PAGE: &str = "GET / HTTP/1.1";
 // html
 pub const GET_HTML_PAGE: &str = "GET /html";
 // js
