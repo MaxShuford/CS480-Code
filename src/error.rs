@@ -1,6 +1,6 @@
 use derive_more::From;
 
-pub type Result<T> = core::result::Result<T, Error>;
+pub type AppResult<T> = core::result::Result<T, Error>;
 
 #[derive(Debug, From)]
 pub enum Error {
@@ -10,4 +10,15 @@ pub enum Error {
 
     // -- user model errors
     LoginFailed { username: String },
+    UserExists { username: String },
+    IncorrectPassword,
+
+    // -- favorite model errors
+    MaxRoutesExceeded,
+    DeleteUnsuccessful,
+    RouteNotFound,
+
+    // -- translate mysql errors into custom error type
+    #[from]
+    MySql(mysql::Error),
 }
