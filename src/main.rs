@@ -1,29 +1,43 @@
 mod routes;
 
-// === Page Handlers ===
-fn serve_login_page() {
-    println!("Serving Login.html");
-    // TODO: read file and return HTTP response
+// === Static File Handler ===
+fn serve_static_file(path: &str) {
+    // Determine base directory and relative path
+    let (base_dir, rel_path) = if path.starts_with("/html/") {
+        ("html", &path[6..])
+    } else if path.starts_with("/js/") {
+        ("js", &path[4..])
+    } else if path.starts_with("/css/") {
+        ("css", &path[5..])
+    } else {
+        println!("Unknown static file prefix: {}", path);
+        return;
+    };
+
+    // Reject any path that contains ".." or additional slashes
+    if rel_path.contains("..") || rel_path.contains('/') {
+        println!("Security: invalid file path '{}'", rel_path);
+        return;
+    }
+
+    let full_path = format!("{}/{}", base_dir, rel_path);
+    println!("Serving static file: {}", full_path);
+
+    // TODO: read file and return HTTP response?
 }
 
-fn serve_create_account_page() {
-    println!("Serving CreateAccount.html");
-}
+// === Helper === 
+// Extract file name from GET request line, ex: "GET /html/Login.html HTTP/1.1" -> "Login.html"
+fn extract_html_file_name(request_line: &str) -> Option<&str> {
+    let mut parts = request_line.split_whitespace();
+    let method = parts.next()?;
+    let path = parts.next()?;
 
-fn serve_change_password_page() {
-    println!("Serving ChangePassword.html");
-}
+    if method != "GET" {
+        return None;
+    }
 
-fn serve_select_waypoints_page() {
-    println!("Serving SelectWaypoints.html");
-}
-
-fn serve_select_route_page() {
-    println!("Serving SelectRoute.html");
-}
-
-fn serve_view_route_page() {
-    println!("Serving ViewRoute.html");
+    path.strip_prefix("/html/")
 }
 
 // === API Handlers ===
@@ -34,7 +48,7 @@ fn handle_login() {
 
 fn handle_create_account() {
     println!("POST /createAccount");
-    // TODO: parse {username, password, confirmPasword}, return {error_code}
+    // TODO: parse {username, password, confirmPassword}, return {error_code}
 }
 
 fn handle_change_password() {
@@ -68,17 +82,16 @@ fn handle_404() {
 
 // === Router ===
 fn route_request(method: &str, path: &str) {
-    // Combine method and path into a single string for matching
-    let route = format!("{}{}", method, path);
+    let route = format!("{} {}", method, path);
 
     match route.as_str() {
-        // Page requests
-        routes::GET_LOGIN_PAGE => serve_login_page(),
-        routes::GET_CREATE_ACCOUNT_PAGE => serve_create_account_page(),
-        routes::GET_CHANGE_PASSWORD_PAGE => serve_change_password_page(),
-        routes::GET_SELECT_WAYPOINTS_PAGE => serve_select_waypoints_page(),
-        routes::GET_SELECT_ROUTE_PAGE => serve_select_route_page(),
-        routes::GET_VIEW_ROUTE_PAGE => serve_view_route_page(),
+        // HTML pages
+        routes::GET_LOGIN_PAGE => serve_static_file("/html/Login.html"),
+        routes::GET_CREATE_ACCOUNT_PAGE => serve_static_file("/html/CreateAccount.html"),
+        routes::GET_CHANGE_PASSWORD_PAGE => serve_static_file("/html/ChangePassword.html"),
+        routes::GET_SELECT_WAYPOINTS_PAGE => serve_static_file("/html/SelectWaypoints.html"),
+        routes::GET_SELECT_ROUTE_PAGE => serve_static_file("/html/SelectRoute.html"),
+        routes::GET_VIEW_ROUTE_PAGE => serve_static_file("/html/ViewRoute.html"),
 
         // API endpoints
         routes::POST_LOGIN => handle_login(),
@@ -89,16 +102,27 @@ fn route_request(method: &str, path: &str) {
         routes::POST_RETRIEVE_FAVORITES => handle_retrieve_favorites(),
         routes::POST_RETRIEVE_FAVORITE => handle_retrieve_favorite(),
 
+        // Static assets (JS, CSS)
+        _ if method == "GET" && (path.starts_with("/js/") || path.starts_with("/css/")) => {
+            serve_static_file(path)
+        }
+
         // Fallback
         _ => handle_404(),
     }
 }
+
 fn main() {
-    // Testing some routes
-    route_request("GET", "/Login.html");
+    route_request("GET", "/html/Login.html");
     route_request("POST", "/login");
-    route_request("GET", "/SelectWaypoints.html");
-    route_request("GET", "/SelectRoute.html");
+    route_request("GET", "/html/SelectWaypoints.html");
+    route_request("GET", "/js/main.js");
+    route_request("GET", "/css/header.css");
     route_request("POST", "/retrieveFavorites");
     route_request("GET", "/nonexistent");
+
+    let raw = "GET /html/Login.html HTTP/1.1";
+    if let Some(file) = extract_html_file_name(raw) {
+        println!("Extracted file name: {}", file);
+    }
 }
