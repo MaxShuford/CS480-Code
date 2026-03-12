@@ -8,13 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const oldPassword = $("[name=oldPassword]");
         const newPassword = $("[name=newPassword]");
         const confirmPassword = $("[name=confirmPassword]");
-        let validOldPassword = validatePassword(oldPassword);  
-        let validNewPassword = validatePassword(newPassword);
+        let validOldPassword = validatePassword(oldPassword, 0);  
+        let validNewPassword = validatePassword(newPassword, 0);
         let validConfirmPassword = passwordsMatch(newPassword, confirmPassword);
-        let verifyPassword = verifyPassword(oldPassword);
-        if(validOldPassword && validNewPassword && validConfirmPassword && verifyPassword)
+        if(validOldPassword && validNewPassword && validConfirmPassword)
         {
-            changePassword(newPassword.value);
+            changePassword(localStorage.getItem("userID"), oldPassword.value, newPassword.value);
         }
     });
 });

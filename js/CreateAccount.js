@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = $("[name=password]");
         const confirmPassword = $("[name=confirmPassword]");
         let validUsername = validateUsername(username);
-        let validPassword = validatePassword(password);
+        let validPassword = validatePassword(password, 0);
         let validConfirmPassword = passwordsMatch(password, confirmPassword);
         if(validUsername && validPassword && validConfirmPassword)
         {

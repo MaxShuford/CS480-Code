@@ -31,10 +31,9 @@ function showDirections()
 
 function favorite()
 {
-    /*
-    const postData = { name: 'New User', job: 'Developer' };
+    const postData = { uid: localStorage.getItem('userID'), route: localStorage.getItem('route') };
 
-    fetch('/', {
+    fetch('/addToFavorite', {
     method: 'POST', // Specify the method
     headers: {
         'Content-Type': 'application/json', // Inform the server the body is JSON
@@ -48,5 +47,4 @@ function favorite()
     .catch((error) => {
     console.error('Error:', error);
     });
-    */
 }

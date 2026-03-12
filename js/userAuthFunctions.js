@@ -1,6 +1,10 @@
 "USE STRICT";
 
-
+/*
+    Validates that the username meets the username requirements
+    param: username - the input element for the username
+    return: true if the username is valid, false if not
+*/
 function validateUsername(username)
 {
     if(username.value === ""){
@@ -19,7 +23,13 @@ function validateUsername(username)
     }
 }
 
-function validatePassword(password)
+/*
+    Validates that the password meets the password requirements
+    param: password - the input element for the password
+              code - 0 for change password, 1 for login (used to determine error message)
+    return: true if the password is valid, false if not
+*/
+function validatePassword(password, code)
 {
     let passrequirmentsmet = 0;
     if(password.value === ""){
@@ -47,7 +57,10 @@ function validatePassword(password)
 
         if(passrequirmentsmet < 3)
         {
-            password.nextElementSibling.textContent = "Password must contain at least 3 of the following: uppercase letters, lowercase letters, numbers, and special characters.";
+            if(code == 0)
+                password.nextElementSibling.textContent = "Password must contain at least 3 of the following: uppercase letters, lowercase letters, numbers, and special characters.";
+            else
+                password.nextElementSibling.textContent = "Invalid Password";
             return false;
         }
         else
@@ -58,6 +71,12 @@ function validatePassword(password)
     }
 }
 
+/*
+    Validates that the confirm password matches the new password
+    param: password - the input element for the new password
+              confirmPassword - the input element for the confirm password
+    return: true if the passwords match, false if not
+*/
 function passwordsMatch(password, confirmPassword)
 {
     if(confirmPassword.value === "")
@@ -77,44 +96,21 @@ function passwordsMatch(password, confirmPassword)
     }
 }
 
-function verifyPassword(oldPassword)
-{
-    /*
-    const postData = { name: 'New User', job: 'Developer' };
-
-    fetch('/', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
-    })
-    .then(response => response.json())
-    .then(data => {
-    console.log('Success:', data);
-    })
-    .catch((error) => {
-    console.error('Error:', error);
-    });
-    */
-
-    if(oldPassword.value === localStorage.getItem("password"))
-    {
-        return true;
-    }
-    else
-    {
-        oldPassword.nextElementSibling.textContent = "Incorrect old password.";
-        return false;
-    }
-}
-
+/*
+    Logs the user in by sending a POST request to the server with the username and hashed password
+    param: username - the username of the user
+        password - the password of the user
+*/
 function login(username, password) {
-
-    /*
-    const postData = { name: 'New User', job: 'Developer' };
-
-    fetch('/', {
+    //hash the password
+    hashString(password).then(hashedPassword => {
+        password = hashedPassword;
+    });
+    
+    //create and send the POST request to the server
+    const postData = { username: username, hashed_pw: password};
+    let userID;
+    fetch('/login', {
     method: 'POST', // Specify the method
     headers: {
         'Content-Type': 'application/json', // Inform the server the body is JSON
@@ -124,26 +120,35 @@ function login(username, password) {
     .then(response => response.json())
     .then(data => {
     console.log('Success:', data);
+    userID = JSON.parse(data).userID;
     })
     .catch((error) => {
     console.error('Error:', error);
-    });
-    */
-
-    hashString(password).then(hashedPassword => {
-        localStorage.setItem('password', hashedPassword);
     });
 
     localStorage.setItem('username', username);
-    
+    localStorage.setItem('userID', userID);
 }
 
-function changePassword(newPassword)
+/*
+    Changes the user's password by sending a POST request to the server with the userID, old hashed password, and new hashed password
+    param: user - the userID of the user
+        oldPassword - the old password of the user
+        newPassword - the new password of the user
+*/
+function changePassword(user, oldPassword, newPassword)
 {
-    /*
-    const postData = { name: 'New User', job: 'Developer' };
+    hashString(oldPassword).then(hashedPassword => {
+        oldPassword = hashedPassword;
+    });
 
-    fetch('/', {
+    hashString(newPassword).then(hashedPassword => {
+        newPassword = hashedPassword;
+    });
+    
+    const postData = { userID: user, old_pw: oldPassword, new_pw: newPassword };
+
+    fetch('/changePassword', {
     method: 'POST', // Specify the method
     headers: {
         'Content-Type': 'application/json', // Inform the server the body is JSON
@@ -157,19 +162,23 @@ function changePassword(newPassword)
     .catch((error) => {
     console.error('Error:', error);
     });
-    */
 
-    hashString(password).then(hashedPassword => {
-        localStorage.setItem('password', hashedPassword);
-    });
 }
 
+/*
+    Creates an account by sending a POST request to the server with the username and hashed password
+    param: username - the username of the user
+        password - the password of the user
+*/
 function createAccount(username, password) 
 {
-    /*
-    const postData = { name: 'New User', job: 'Developer' };
+    hashString(password).then(hashedPassword => {
+        password = hashedPassword;
+    });
 
-    fetch('/', {
+    const postData = { username: username, hashed_pw: password };
+
+    fetch('/createAccount', {
     method: 'POST', // Specify the method
     headers: {
         'Content-Type': 'application/json', // Inform the server the body is JSON
@@ -183,7 +192,6 @@ function createAccount(username, password)
     .catch((error) => {
     console.error('Error:', error);
     });
-    */
 
     localStorage.setItem('username', username);
     hashString(password).then(hashedPassword => {
@@ -191,6 +199,11 @@ function createAccount(username, password)
     });
 }
 
+/*
+    Hashes a string using the SHA-256 algorithm and returns the hash as a hex string
+    param: message - the string to be hashed
+    return: the hashed string as a hex string
+*/
 async function hashString(message) {
     // Encode the string as a Uint8Array
     const msgBuffer = new TextEncoder().encode(message); 
@@ -201,6 +214,6 @@ async function hashString(message) {
     // Convert the ArrayBuffer to a hex string
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
-    
+    console.log(hashHex);
     return hashHex;
 }
