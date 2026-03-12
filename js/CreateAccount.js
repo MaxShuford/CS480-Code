@@ -2,6 +2,11 @@
 
 const $ = selector => document.querySelector(selector);
 
+const backToLogin = () => {
+
+    location.href = "Login.html";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     $("[type=button]").addEventListener("click", event => {
         event.preventDefault();
@@ -17,5 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
             login(username.value, password.value);
         }
     });
+
+    $(".backButton").addEventListener("click", backToLogin);
 });
 

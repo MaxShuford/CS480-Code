@@ -7,4 +7,23 @@
 
 .backButton{
     text-align: left;
+    float: left;
+    display: flex;
+    cursor: pointer;
+    margin-top: 35px;
+}
+
+.backButton h2{
+    margin: 0;
+    color: black;
+}
+
+.backButton:hover h2{
+    color:rgb(10, 106, 93);
+}
+
+
+#backIcon{
+    height: 30px;
+    width: 30px;
 }

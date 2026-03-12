@@ -17,5 +17,16 @@ document.addEventListener("DOMContentLoaded", () => {
             $("#changePassword").submit();
         }
     });
+
+    $(".backButton").addEventListener("click", backToWP);
 });
+
+//Back to home button PROTOTYPE
+const backToWP = () => {
+
+    //What data should be brought back to Waypoints?
+
+
+    location.href = "Waypoints.html";
+}
 

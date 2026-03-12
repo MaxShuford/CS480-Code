@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
     $("#destination").value = localStorage.getItem("destination");
     showAlternateRoutes();
     showImage();
+
+    $(".backButton").addEventListener("click", backToWP);
 });
 
 function showAlternateRoutes()
@@ -44,4 +46,13 @@ function showImage()
     .catch((error) => {
     console.error('Error:', error);
     });
+}
+
+//Back to home button PROTOTYPE
+const backToWP = () => {
+
+    //What data should be brought back to Waypoints?
+
+
+    location.href = "Waypoints.html";
 }

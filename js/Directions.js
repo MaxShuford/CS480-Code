@@ -8,6 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     showImage();
     showDirections();
+
+    $(".backButton").addEventListener("click", backToRoutes);
 });
 
 function showImage()
@@ -60,4 +62,13 @@ function favorite()
     .catch((error) => {
     console.error('Error:', error);
     });
+}
+
+//Back to route button PROTOTYPE
+const backToRoutes = () => {
+
+    //What data should be brought back to
+
+
+    location.href = "Route.html";
 }
