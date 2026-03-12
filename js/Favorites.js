@@ -8,13 +8,44 @@ const getFavorites = (ActionEvent) => {
 
     console.log(idNum);
 
+    const postData = {uid:localStorage.getItem("userID")};
+    fetch('/retrieveFavorites', {
+    method: 'POST', // Specify the method
+    headers: {
+        'Content-Type': 'application/json', // Inform the server the body is JSON
+    },
+    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Success:', data);
+    favorites = JSON.parse(data);
+    })
+    .catch((error) => {
+    console.error('Error:', error);
+    });
+
 }
 
 
 const removeFavorite = (ActionEvent) => {
 
     console.log(ActionEvent.value);
-
+    const postData = {uid:localStorage.getItem("userID"), route_id:/*routeID*/};
+    fetch('/delFavorite', {
+    method: 'POST', // Specify the method
+    headers: {
+        'Content-Type': 'application/json', // Inform the server the body is JSON
+    },
+    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Success:', data);
+    })
+    .catch((error) => {
+    console.error('Error:', error);
+    });
 }
 
 
