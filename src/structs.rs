@@ -7,7 +7,8 @@ pub struct User {
 #[derive(Debug, Clone)]
 pub struct ChangePassword {
     pub uuid: i64,
-    pub pw_hash: String,
+    pub old_pw: String,
+    pub new_pw: String,
 }
 
 #[derive(Debug, Clone)]
