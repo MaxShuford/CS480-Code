@@ -242,6 +242,8 @@ fn route_request(method: &str, path: &str) {
 }
 
 fn main() {
+    // TODO: read api keys from a config file
+
     // listen to local hosted
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
 

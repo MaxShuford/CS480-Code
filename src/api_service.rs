@@ -166,10 +166,28 @@ pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) -> Resu
     );
     markers.push_str(temp.as_str());
 
-    // TODO: add route polylines and waypoints markers to api call
     let api_call_str = format!(
         "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{geo_paths}{markers}/auto/400x400?access_token={api_key}"
     );
+    let api_result = api_call(api_call_str.as_str())?;
+
+    // NOTE: TEMP
+    let img = load_from_memory(&api_result).expect("Failed to load image from mem");
+    let mut file = File::create("mapbox_result.png").expect("Failed to create file");
+    img.write_to(&mut file, image::ImageFormat::Png)
+        .expect("Failed to write img to file");
+    // NOTE: END TEMP
+
+    Ok(general_purpose::STANDARD.encode(&api_result))
+}
+
+pub fn static_images_with_user_loc(location: (f32, f32), api_key: &str) -> Result<String> {
+    let lon = location.1;
+    let lat = location.0;
+    let api_call_str = format!(
+        "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{lon},{lat},2/400x400?access_token={api_key}"
+    );
+
     let api_result = api_call(api_call_str.as_str())?;
 
     // NOTE: TEMP
