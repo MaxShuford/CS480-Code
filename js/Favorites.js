@@ -31,7 +31,7 @@ const getFavorites = (ActionEvent) => {
 const removeFavorite = (ActionEvent) => {
 
     console.log(ActionEvent.value);
-    const postData = {uid:localStorage.getItem("userID"), route_id:/*routeID*/};
+    const postData = {uid:localStorage.getItem("userID")};
     fetch('/delFavorite', {
     method: 'POST', // Specify the method
     headers: {
@@ -74,7 +74,7 @@ const removeFavorite = (ActionEvent) => {
 
 */
 
-const createFavorite = () => {
+const createFavorite = (name, routeID) => {
 
     console.log("Creating Favorite to list");
 
@@ -97,7 +97,7 @@ const createFavorite = () => {
 
     //StartCity and set to child of firstHalf
     const startCity = document.createElement("span");
-    startCity.textContent = "Ellensburg, WA";
+    startCity.textContent = name;
     firstHalfDiv.appendChild(startCity);
 
     //Create a new arrow img element and set as child of firstHalf
@@ -109,7 +109,7 @@ const createFavorite = () => {
 
     //EndCity and set to child of firstHalf
     const endCity = document.createElement("span");
-    endCity.textContent = "Seattle, WA";
+    endCity.textContent = name;
     firstHalfDiv.appendChild(endCity);
 
     //Create SecondHalf
@@ -140,7 +140,6 @@ const createFavorite = () => {
 
     //Put li to Ul
     listOfFavorite.appendChild(listItem);
-
 }
 
 //DomContentLoaded
@@ -148,9 +147,27 @@ document.addEventListener("DOMContentLoaded", () =>{
 
 
     //GET FAVORITES FROM DB HERE
-
+    const postData = {uid:localStorage.getItem("userID")};
+    fetch('/retrieveFavorites', {
+    method: 'POST', // Specify the method
+    headers: {
+        'Content-Type': 'application/json', // Inform the server the body is JSON
+    },
+    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Success:', data);
+    favorites = JSON.parse(data);
+    })
+    .catch((error) => {
+    console.error('Error:', error);
+    });
     //CREATE FAVORITES ITEMS HERE
-
+    for(let i = 0; i < favorites.names.length; i++)
+    {
+        createFavorite(favorites.name[i], favorites.route_id[i]);
+    }
     //Get all the add and trash buttons and give them their function.
     const allAddButtons = document.querySelectorAll("#FavRoute");
     const allTrashButtons = document.querySelectorAll(".trash")

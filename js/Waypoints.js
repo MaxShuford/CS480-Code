@@ -20,16 +20,16 @@ const getRoutes = () => {
     console.log(destinationCity);
 
 
-    let validStart = !(startCity.includes(", "));
-    let validEnd = !(destinationCity.includes(", "));
+    let validStart = (startCity.includes(", "));
+    let validEnd = (destinationCity.includes(", "));
 
     console.log(validStart);
     console.log(validEnd);
     //Check if the city input had valid format
-    if(validStart || validEnd){
+    if(!validStart || !validEnd){
         alert('INVALID FORMAT');
     }
-    else if(!validStart && !validEnd)
+    else if(validStart && validEnd)
     {
         numOfWaypoints = 2;
     }
@@ -158,7 +158,6 @@ const showUserLocation = () => {
     .catch((error) => {
     console.error('Error:', error);
     });
-
   });
 }
 

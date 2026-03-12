@@ -11,8 +11,10 @@ document.addEventListener("DOMContentLoaded", () => {
         let validPassword = validatePassword(password, 1);
         if(validUsername && validPassword)
         {
-            login(username.value, password.value);
-            $("#login").submit();
+            //login(username.value, password.value);
+            $("[name=username]").value = "";
+            $("[name=password]").value = "";
+            window.location.href = "/html/Waypoints.html";
         }
     });
 });
