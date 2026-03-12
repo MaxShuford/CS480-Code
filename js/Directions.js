@@ -12,16 +12,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function showImage()
 {
-    //const image = localStorage.getItem("image");
-    //$(img).src = image;
+    const postData = {routes: localStorage.getItem("routes")};
+
+    fetch('/mapWithRoutes', {
+    method: 'POST', // Specify the method
+    headers: {
+        'Content-Type': 'application/json', // Inform the server the body is JSON
+    },
+    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Success:', data);
+    const image = JSON.parse(data).image
+    $("img").src = "data:image/png;base64," + image;
+    })
+    .catch((error) => {
+    console.error('Error:', error);
+    });
 }
 
 function showDirections()
 {
-    
-    //const directions = localStorage.getItem("directions")
-    const directions = ["go that way","go this way", "turn around 30 feet ago", "go back 20 feet", "go forward 10 feet", "turn left", "turn right", "go up the stairs", "go down the stairs"];
-
+    const directions = localStorage.getItem("routes");
     for (let i = 0; i < directions.length; i++){
         const newLi = document.createElement("li");
         newLi.textContent = directions[i];

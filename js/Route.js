@@ -3,18 +3,15 @@
 const $ = selector => document.querySelector(selector);
 
 document.addEventListener("DOMContentLoaded", () => {
-    //$("#start").value = localStorage.getItem("start");
-    //$("#destination").value = localStorage.getItem("destination");
-    $("#start").textContent = "Ellensburg";
-    $("#destination").textContent = "Seattle";
+    $("#start").value = localStorage.getItem("start");
+    $("#destination").value = localStorage.getItem("destination");
     showAlternateRoutes();
     showImage();
 });
 
 function showAlternateRoutes()
 {
-    //const routes = localStorage.getItem("routes")
-    const routes = ["i-90", "W-12", "P-50"];
+    const routes = localStorage.getItem("routes")
     for (let i = 0; i < routes.length; i++){
         const newLi = document.createElement("li");
         newLi.textContent = routes[i];
@@ -23,17 +20,28 @@ function showAlternateRoutes()
         newButton.textContent = "View Directions";
         $("aside ul:last-child").appendChild(newButton);
         $("aside ul:last-child button").addEventListener("click", event => {
-            getDirectiosns(i);
+            localStorage.setItem("routes", routes[i]);
         });
     }
 }
 
 function showImage()
 {
-
-}
-
-function getDirectiosns(routeNum)
-{
-    
+    const postData = {routes: localStorage.getItem("routes")};
+    fetch('/mapWithRoutes', {
+    method: 'POST', // Specify the method
+    headers: {
+        'Content-Type': 'application/json', // Inform the server the body is JSON
+    },
+    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Success:', data);
+    const image = JSON.parse(data).image
+    $("img").src = "data:image/png;base64," + image;
+    })
+    .catch((error) => {
+    console.error('Error:', error);
+    });
 }
