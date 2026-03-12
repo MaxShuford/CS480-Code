@@ -382,6 +382,17 @@ fn handle_request(request_line: &str, body_content: &str) -> (String, String, St
                 ("HTTP/1.1 200 Ok", "text/css", contents)
             }
         }
+        // TODO: geocoding api handle
+        // TODO: directions api handle
+        // TODO: static map with routes handle
+        // TODO: static map with user location handle
+        // TODO: login handle
+        // TODO: create account handle
+        // TODO: change password handle
+        // TODO: add favorite handle
+        // TODO: delete favorite handle
+        // TODO: retrieve favorites handle
+        // TODO: retrieve favorite handle
         _ => (
             "HTTP/1.1 404 Not Found",
             "text/plain",
