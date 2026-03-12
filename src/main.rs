@@ -429,7 +429,7 @@ fn handle_request(
                         serde_json::to_string(&wp).expect("Invalid lat and lon struct"),
                     )
                 }
-                Err(e) => (
+                Err(_) => (
                     "HTTP/1.1 400 Bad Request",
                     "text/plain",
                     String::from("Invalid location"),
@@ -438,15 +438,28 @@ fn handle_request(
 
             response
         }
-        "POST /directions" => {
+        "POST /directions HTTP/1.1" => {
             let waypoints: Vec<structs::Waypoint> =
                 serde_json::from_str(body_content).expect("invalid waypoint json file");
             let waypoints: Vec<(f32, f32)> = waypoints
                 .iter()
-                .map(|s| (s.longitude as f32, s.latitude as f32))
+                .map(|s| (s.latitude as f32, s.longitude as f32))
                 .collect();
 
-            ("", "", String::new())
+            let response = match api_service::directions(api_keys.mapbox.as_str(), waypoints) {
+                Ok(routes) => (
+                    "HTTP/1.1 200 Ok",
+                    "application/json",
+                    serde_json::to_string(&routes).expect("Invalid route object"),
+                ),
+                Err(_) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    String::from("Unable to route"),
+                ),
+            };
+
+            response
         }
         // TODO: static map with routes handle
         // TODO: static map with user location handle
