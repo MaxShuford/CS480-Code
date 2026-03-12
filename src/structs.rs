@@ -19,7 +19,7 @@ pub struct Route {
     pub wp: Vec<Waypoint>,
 }
 
-#[derive(Debug, Clone, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Waypoint {
     pub id: i32,
     pub name: String,
