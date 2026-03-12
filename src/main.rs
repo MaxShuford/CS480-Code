@@ -40,6 +40,10 @@ fn serve_static_file(path: &str) {
 // "GET/html" will be used for matching and "Login.html" will be used for file retrieving
 // 3 match conditions and 3 ways to retrieve files
 fn extract_file_name(request_line: &str) -> Option<(String, String)> {
+    if &request_line[..] == "GET / HTTP/1.1" {
+        return None;
+    }
+
     let mut parts = request_line.split_whitespace();
     let method = parts.next()?;
     let path = parts.next()?;
@@ -66,6 +70,7 @@ fn extract_file_name(request_line: &str) -> Option<(String, String)> {
     }
 
     let match_key = format!("{} {}", method, prefix); // ex: "GET /html"
+    println!("{match_key}");
     Some((match_key, rest.to_string()))
 }
 
@@ -265,6 +270,7 @@ fn main() {
 }
 
 fn handle_stream(mut stream: TcpStream) {
+    println!("request recieved");
     let mut reader = BufReader::new(&mut stream);
 
     // read request line
@@ -316,23 +322,27 @@ fn handle_stream(mut stream: TcpStream) {
 
     let length = response_body.len();
     let response = format! {
-        "HTTP/1.1 {status_line}
-    Content-Length: {length}\r\n\r\n\
+        "{status_line}
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n\
     {response_body}"
     };
     println!("{response}");
 
     stream.write_all(response.as_bytes()).unwrap();
+    println!("response sent");
 }
 
 fn handle_request(request_line: &str, body_content: &str) -> (String, String, String) {
     let (request_code, file_name) = match extract_file_name(request_line) {
-        Some((file_type, file_name)) => (format!("GET /{file_type}"), file_name),
-        None => (String::from(request_line), String::from("")),
+        Some((file_type, file_name)) => (format!("{file_type}"), file_name),
+        None => (String::from(request_line.trim_end()), String::from("")),
     };
+    println!("Request Code: {request_code}, File_name: {file_name}");
 
-    let (status_code, content_type, body) = match request_code.as_str() {
-        GET_LANDING_PAGE => {
+    let (status_code, content_type, body) = match &request_code[..] {
+        "GET / HTTP/1.1" => {
+            println!("LANDING PAGE RETRIEVAL");
             let contents = file_retrieve("html", "Login.html");
             if contents.as_str() == "File not Found" {
                 (
@@ -344,7 +354,7 @@ fn handle_request(request_line: &str, body_content: &str) -> (String, String, St
                 ("HTTP/1.1 200 Ok", "text/html", contents)
             }
         }
-        GET_HTML_PAGE => {
+        "GET /html" => {
             let contents = file_retrieve("html", file_name.as_str());
             if contents.as_str() == "File not Found" {
                 (
@@ -356,7 +366,7 @@ fn handle_request(request_line: &str, body_content: &str) -> (String, String, St
                 ("HTTP/1.1 200 Ok", "text/html", contents)
             }
         }
-        GET_JS_PAGE => {
+        "GET /js" => {
             let contents = file_retrieve("js", file_name.as_str());
             if contents.as_str() == "File not Found" {
                 (
@@ -372,7 +382,7 @@ fn handle_request(request_line: &str, body_content: &str) -> (String, String, St
                 )
             }
         }
-        GET_CSS_PAGE => {
+        "GET /css" => {
             let contents = file_retrieve("css", file_name.as_str());
             if contents.as_str() == "File not Found" {
                 (
@@ -406,6 +416,7 @@ fn handle_request(request_line: &str, body_content: &str) -> (String, String, St
 }
 
 fn file_retrieve(file_type: &str, filename: &str) -> String {
+    println!("Retrieving: {file_type}/{filename}");
     let path = format!("{file_type}/{filename}");
     let contents = match fs::read_to_string(path) {
         Ok(str) => str,

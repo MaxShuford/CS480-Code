@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function showAlternateRoutes()
 {
-    const routes = localStorage.getItem("routes")
+    //const routes = localStorage.getItem("routes")
     for (let i = 0; i < routes.length; i++){
         const newLi = document.createElement("li");
         newLi.textContent = routes[i];
