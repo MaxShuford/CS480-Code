@@ -70,7 +70,7 @@ pub struct DirectionOptions {
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RouteWithDirections {
-    pub waypoints: Vec<(f32, f32)>,
+    pub waypoints: Vec<Waypoint>,
     pub directions: Vec<String>,
     pub geometry: String,
 }

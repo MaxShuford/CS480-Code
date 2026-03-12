@@ -9,7 +9,7 @@ use std::fs::File;
 use std::sync::{Arc, Mutex};
 
 use crate::error::{Error, Result};
-use crate::structs::{DirectionOptions, RouteToMap, RouteWithDirections};
+use crate::structs::{DirectionOptions, RouteToMap, RouteWithDirections, Waypoint};
 
 // TODO: Real errors instead of expect then change return type to result
 
@@ -102,7 +102,16 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> Result<Direction
     // construct usable route data from heavily nested json
     let mut routes: Vec<RouteWithDirections> = Vec::with_capacity(result.routes.len());
     for route in result.routes {
-        let waypoints = locations.clone();
+        let mut waypoints = Vec::new();
+        for i in 0..locations.len() {
+            waypoints.push(Waypoint {
+                id: i as i32,
+                name: "".to_string(),
+                latitude: locations[i].0 as f64,
+                longitude: locations[i].1 as f64,
+            })
+        }
+
         let mut directions: Vec<String> = Vec::new();
         for leg in route.legs {
             for step in leg.steps {
