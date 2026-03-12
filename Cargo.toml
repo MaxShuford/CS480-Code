@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 base64 = "0.22.1"
 curl = "0.4.49"
+derive_more = {version = "2.1.1", features = ["from"]}
 image = "0.25.10"
 regex = "1.12.3"
 serde = {version = "1.0.228", features = ["derive"]}

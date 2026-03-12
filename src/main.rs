@@ -3,6 +3,12 @@ mod error;
 mod routes;
 pub mod structs;
 
+use std::{
+    fs,
+    io::{BufReader, prelude::*},
+    net::{TcpListener, TcpStream},
+};
+
 // === Static File Handler ===
 fn serve_static_file(path: &str) {
     // Determine base directory and relative path
@@ -29,7 +35,7 @@ fn serve_static_file(path: &str) {
     // TODO: read file and return HTTP response?
 }
 
-// === Helper === 
+// === Helper ===
 // Extract file name from GET request line, ex: "GET /html/Login.html" -> ("GET/html", "Login.html")
 // "GET/html" will be used for matching and "Login.html" will be used for file retrieving
 // 3 match conditions and 3 ways to retrieve files
@@ -53,6 +59,11 @@ fn extract_file_name(request_line: &str) -> Option<(String, String)> {
     } else {
         return None;
     };
+
+    // ignore requests looking for parent or subdirectories
+    if rest.contains("..") || rest.contains("/") {
+        return None;
+    }
 
     let match_key = format!("{} {}", method, prefix); // ex: "GET /html"
     Some((match_key, rest.to_string()))
@@ -230,6 +241,14 @@ fn route_request(method: &str, path: &str) {
 }
 
 fn main() {
+    // listen to local hosted
+    let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
+
+    for stream in listener.incoming() {
+        let stream = stream.unwrap();
+        parse_stream(stream);
+    }
+
     route_request("GET", "/html/Login.html");
     route_request("POST", "/login");
     route_request("GET", "/html/SelectWaypoints.html");
@@ -239,7 +258,60 @@ fn main() {
     route_request("GET", "/nonexistent");
 
     let raw = "GET /html/Login.html HTTP/1.1";
-    if let Some(file) = extract_file_name(raw) {
-        println!("Extracted file name: {}", file);
+    if let Some(file) = extract_file_name(raw) {}
+}
+
+fn parse_stream(mut stream: TcpStream) {
+    let mut reader = BufReader::new(&mut stream);
+
+    // read request line
+    let mut request_line = String::new();
+    reader.read_line(&mut request_line).unwrap();
+    println!("=== Request Line ===\n{}", request_line);
+
+    // read the headers
+    let mut headers = Vec::new();
+    let mut content_length = 0;
+
+    loop {
+        let mut line = String::new();
+        reader.read_line(&mut line).unwrap();
+
+        if line == "\r\n" || line == "\n" {
+            break;
+        }
+
+        if line.to_lowercase().starts_with("content-length:") {
+            content_length = line
+                .split(':')
+                .nth(1)
+                .and_then(|v| v.trim().parse::<usize>().ok())
+                .unwrap_or(0);
+        }
+        headers.push(line.trim().to_string());
     }
+
+    println!("=== Headers ===");
+    for h in headers {
+        println!("{}", h);
+    }
+
+    // read the body
+    if content_length > 0 {
+        let mut body = vec![0; content_length];
+        reader.read_exact(&mut body).unwrap();
+        println!("=== Body ===\n{}", String::from_utf8_lossy(&body));
+    } else {
+        println!("=== No Body ===");
+    }
+
+    let contents = fs::read_to_string("html/Login.html").unwrap();
+    let length = contents.len();
+    let response = format! {
+        "HTTP/1.1 200 OK\r\n
+        Content-Length: {length}\r\n\r\n\
+        {contents}"
+    };
+
+    stream.write_all(response.as_bytes()).unwrap();
 }
