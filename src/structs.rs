@@ -13,7 +13,7 @@ pub struct ChangePassword {
     pub new_pw: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Route {
     pub route_id: i32,
     pub wp: Vec<Waypoint>,
@@ -56,7 +56,7 @@ pub struct FavoriteReturn {
     pub route_id: i32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct RouteToMap {
     pub route: Route,
     pub geometry: String,
@@ -85,4 +85,10 @@ pub struct UserEnteredLocation {
 pub struct APIKeys {
     pub geocoding: String,
     pub mapbox: String,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct Base64Image {
+    pub image_type: String,
+    pub image: String,
 }

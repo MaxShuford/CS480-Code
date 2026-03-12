@@ -353,6 +353,7 @@ fn handle_request(
     println!("Request Code: {request_code}, File_name: {file_name}");
 
     let (status_code, content_type, body) = match &request_code[..] {
+        // Initial page request
         "GET / HTTP/1.1" => {
             println!("LANDING PAGE RETRIEVAL");
             let contents = file_retrieve("html", "Login.html");
@@ -366,6 +367,7 @@ fn handle_request(
                 ("HTTP/1.1 200 Ok", "text/html", contents)
             }
         }
+        // any html page request
         "GET /html" => {
             let contents = file_retrieve("html", file_name.as_str());
             if contents.as_str() == "File not Found" {
@@ -378,6 +380,7 @@ fn handle_request(
                 ("HTTP/1.1 200 Ok", "text/html", contents)
             }
         }
+        // any js page request
         "GET /js" => {
             let contents = file_retrieve("js", file_name.as_str());
             if contents.as_str() == "File not Found" {
@@ -394,6 +397,7 @@ fn handle_request(
                 )
             }
         }
+        // any css page request
         "GET /css" => {
             let contents = file_retrieve("css", file_name.as_str());
             if contents.as_str() == "File not Found" {
@@ -406,8 +410,8 @@ fn handle_request(
                 ("HTTP/1.1 200 Ok", "text/css", contents)
             }
         }
+        // requesting to turn city state code into lat lon
         "POST /locationData HTTP/1.1" => {
-            // I have city name, state code in a json
             let location: structs::UserEnteredLocation =
                 serde_json::from_str(body_content).expect("invalid location json file");
             let response = match api_service::geocoding(
@@ -438,6 +442,7 @@ fn handle_request(
 
             response
         }
+        // requesting routes from a list of waypoints
         "POST /directions HTTP/1.1" => {
             let waypoints: Vec<structs::Waypoint> =
                 serde_json::from_str(body_content).expect("invalid waypoint json file");
@@ -461,7 +466,30 @@ fn handle_request(
 
             response
         }
-        // TODO: static map with routes handle
+        // requesting a map with routes on it
+        "POST /mapWithRoutes" => {
+            println!("generating map");
+            let routes: Vec<structs::RouteToMap> =
+                serde_json::from_str(body_content).expect("Invalid routes with polyline json");
+            let response =
+                match api_service::static_images_with_routes(routes, api_keys.mapbox.as_str()) {
+                    Ok(image_str) => (
+                        "HTTP/1.1 200 Ok",
+                        "application/json",
+                        serde_json::to_string(&structs::Base64Image {
+                            image_type: "png".to_string(),
+                            image: image_str,
+                        })
+                        .expect("Invalid  struct base64Image"),
+                    ),
+                    Err(_) => (
+                        "HTTP/1.1 400 Bad Request",
+                        "text/plain",
+                        String::from("Unable to map"),
+                    ),
+                };
+            ("", "", String::new())
+        }
         // TODO: static map with user location handle
         // TODO: login handle
         // TODO: create account handle
