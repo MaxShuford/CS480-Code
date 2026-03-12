@@ -47,6 +47,12 @@ pub struct Favorite {
     pub route_id: i32,
 }
 
+#[derive(Debig, Clone)]
+pub struct FavoriteReturn {
+    pub name: String,
+    pub route_id: i32,
+}
+
 #[derive(Debug, Clone)]
 pub struct RouteToMap {
     pub route: Route,
