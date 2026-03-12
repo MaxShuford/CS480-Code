@@ -265,6 +265,7 @@ fn main() {
 }
 
 fn handle_stream(mut stream: TcpStream) {
+    println!("request recieved");
     let mut reader = BufReader::new(&mut stream);
 
     // read request line
@@ -316,13 +317,15 @@ fn handle_stream(mut stream: TcpStream) {
 
     let length = response_body.len();
     let response = format! {
-        "HTTP/1.1 {status_line}
-    Content-Length: {length}\r\n\r\n\
+        "{status_line}
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n\
     {response_body}"
     };
     println!("{response}");
 
     stream.write_all(response.as_bytes()).unwrap();
+    println!("response sent");
 }
 
 fn handle_request(request_line: &str, body_content: &str) -> (String, String, String) {
