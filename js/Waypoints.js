@@ -43,6 +43,25 @@ const getRoutes = () => {
                 alert("Invalid Format");
                 break;
             }
+            
+            wpSplit = wpCity.split(",");
+            const postData = {city:wpSplit[0], state:wpSplit[1]};
+            fetch('/locationData', {
+            method: 'POST', // Specify the method
+            headers: {
+                'Content-Type': 'application/json', // Inform the server the body is JSON
+            },
+            body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+            })
+            .then(response => response.json())
+            .then(data => {
+            console.log('Success:', data);
+            locationData = JSON.parse(data)
+            })
+            .catch((error) => {
+            console.error('Error:', error);
+            });
+
         }
     }
 
