@@ -94,6 +94,34 @@ const createWaypoint = () => {
 
 }
 
+const showUserLocation = () => {
+    navigator.geolocation.getCurrentPosition(function(position) {
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+    console.log("Latitude:", lat, "Longitude:", lng);
+
+    const postData = {latitude: lat, longitude: lng};
+    fetch('/mapWithUserLoc', {
+    method: 'POST', // Specify the method
+    headers: {
+        'Content-Type': 'application/json', // Inform the server the body is JSON
+    },
+    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Success:', data);
+    const image = JSON.parse(data).image
+    $("img").src = "data:image/png;base64," + image;
+    })
+    .catch((error) => {
+    console.error('Error:', error);
+    });
+
+  });
+}
+
+
 //Runs accordian function
 $(document).ready(function(){
         
@@ -108,6 +136,7 @@ $(document).ready(function(){
 
 //DomContentLoaded
 document.addEventListener("DOMContentLoaded", () =>{
+    showUserLocation();
     $$("#GetRoute").addEventListener("click", getRoutes);
     $$("#wayAdd").addEventListener("click", createWaypoint);
     $$("[name=startCity]").focus();  
