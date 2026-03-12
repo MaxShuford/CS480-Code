@@ -1,0 +1,56 @@
+aside ul{
+    line-height: 75px;
+    width: 90%;
+}
+
+aside div{
+    width: 90%;
+}
+
+.textbox{
+  border: 2px solid;
+  height: 50px;
+  width: 33%;
+  font-size: 20px;
+  line-height: 50px;
+  background-color: rgb(234, 234, 234);
+}
+
+#start{
+    float:left;
+}
+
+#destination{
+    float:right;
+}
+
+aside li{
+  list-style: none;
+  height: 75px;
+  text-align: left;
+  border: 2px solid black;
+  background-color: rgb(123, 123, 123);
+  font-size: 30px;
+  font-weight: bold;
+  color: white;
+  padding-left: 5%;
+  margin: 25% 0;
+}
+
+aside li span{
+    float:left;
+}
+
+aside li .buttons{
+    float:right;
+    margin: 6%;
+    width: 200px;
+    height: 30px;
+    font-size: 20px;
+}
+
+#sideArrow {
+    transform: rotate(180deg);
+    height: 50px;
+    width: 50px;
+}

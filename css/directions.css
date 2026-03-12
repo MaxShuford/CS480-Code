@@ -18,3 +18,12 @@ aside li{
   color: white;
   padding-left: 5%;
 }
+
+#favoriteButton{
+    width:50%;
+    height:35px;
+    border: 2px solid;
+    margin-right: 2em;
+    float: center;
+    font-size: 20px;
+}

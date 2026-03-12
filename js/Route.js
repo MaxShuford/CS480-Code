@@ -15,15 +15,26 @@ function showAlternateRoutes()
 {
     //const routes = localStorage.getItem("routes")
     for (let i = 0; i < routes.length; i++){
+
+        //Create New List Item
         const newLi = document.createElement("li");
         newLi.textContent = routes[i];
-        $("aside ul").appendChild(newLi);
+
+        //Create Text of Route X then add as child of li
+        const newText = document.createElement("Span");
+        newText.textContent = "Route " + i;
+        newLi.appendChild(newText);
+
+        //Create new button, give event then add as child of li
         const newButton = document.createElement("button");
         newButton.textContent = "View Directions";
-        $("aside ul:last-child").appendChild(newButton);
-        $("aside ul:last-child button").addEventListener("click", event => {
+        newButton.addEventListener("click", event => {
             localStorage.setItem("routes", routes[i]);
         });
+        newLi.appendChild(newButton);
+
+        //add Li as child of ul
+        $("aside ul").appendChild(newLi);
     }
 }
 

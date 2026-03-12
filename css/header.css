@@ -57,7 +57,7 @@ li a{
 
 }
 
-#firstBar{
+#firstBar, .nonExtend #firstBar:hover{
     border-radius: 15px;
 }
 
