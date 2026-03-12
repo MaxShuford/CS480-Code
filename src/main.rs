@@ -1,4 +1,7 @@
+mod api_service;
+mod error;
 mod routes;
+pub mod structs;
 
 // === Static File Handler ===
 fn serve_static_file(path: &str) {
@@ -26,7 +29,7 @@ fn serve_static_file(path: &str) {
     // TODO: read file and return HTTP response?
 }
 
-// === Helper === 
+// === Helper ===
 // Extract file name from GET request line, ex: "GET /html/Login.html HTTP/1.1" -> "Login.html"
 fn extract_html_file_name(request_line: &str) -> Option<&str> {
     let mut parts = request_line.split_whitespace();

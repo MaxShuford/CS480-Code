@@ -52,3 +52,16 @@ pub struct RouteToMap {
     pub route: Route,
     pub geometry: String,
 }
+
+#[derive(Debug, Clone)]
+pub struct DirectionOptions {
+    pub code: String,
+    pub routes: Vec<RouteWithDirections>,
+}
+
+#[derive(Debug, Clone)]
+pub struct RouteWithDirections {
+    pub waypoints: Vec<(f32, f32)>,
+    pub directions: Vec<String>,
+    pub geometry: String,
+}
