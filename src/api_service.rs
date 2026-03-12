@@ -8,12 +8,12 @@ use serde_json;
 use std::fs::File;
 use std::sync::{Arc, Mutex};
 
-use crate::error::{Error, Result};
+use crate::error::{AppResult, Error};
 use crate::structs::{DirectionOptions, RouteToMap, RouteWithDirections, Waypoint};
 
 // TODO: Real errors instead of expect then change return type to result
 
-fn api_call(api_call_str: &str) -> Result<Vec<u8>> {
+fn api_call(api_call_str: &str) -> AppResult<Vec<u8>> {
     // Arc::Mutex allows us to clone out vec and use it in a closure for the write_function
     let out = Arc::new(Mutex::new(Vec::new()));
     let out_closure = out.clone();
@@ -39,7 +39,7 @@ fn api_call(api_call_str: &str) -> Result<Vec<u8>> {
     Ok(result.clone())
 }
 
-pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> Result<(f32, f32)> {
+pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> AppResult<(f32, f32)> {
     let city_name = city_name.replace(" ", "+");
 
     // constuct
@@ -81,7 +81,7 @@ pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> Result<(f3
     Ok((lat, lon))
 }
 
-pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> Result<DirectionOptions> {
+pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> AppResult<DirectionOptions> {
     // construct api call
     let mut loc_str = format!("{},{}", locations[0].1, locations[0].0);
     for i in 1..(locations.len()) {
@@ -132,7 +132,7 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> Result<Direction
     })
 }
 
-pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) -> Result<String> {
+pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) -> AppResult<String> {
     // build str for paths
     let mut geo_paths = String::new();
     for i in 0..routes.len() {
@@ -190,7 +190,7 @@ pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) -> Resu
     Ok(general_purpose::STANDARD.encode(&api_result))
 }
 
-pub fn static_images_with_user_loc(location: (f32, f32), api_key: &str) -> Result<String> {
+pub fn static_images_with_user_loc(location: (f32, f32), api_key: &str) -> AppResult<String> {
     let lon = location.1;
     let lat = location.0;
     let api_call_str = format!(
