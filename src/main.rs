@@ -248,13 +248,22 @@ fn route_request(method: &str, path: &str) {
 
 fn main() {
     // TODO: read api keys from a config file
+    let api_keys = fs::read_to_string("api_keys.txt").expect("Unable to read api_keys");
+    let mut lines = api_keys.lines();
+    let geocoding = lines.next().unwrap_or("");
+    let mapbox = lines.next().unwrap_or("");
+
+    let api_keys = structs::APIKeys {
+        geocoding: geocoding.to_string(),
+        mapbox: mapbox.to_string(),
+    };
 
     // listen to local hosted
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
-        handle_stream(stream);
+        handle_stream(stream, &api_keys);
     }
 
     route_request("GET", "/html/Login.html");
@@ -269,7 +278,7 @@ fn main() {
     if let Some(file) = extract_file_name(raw) {}
 }
 
-fn handle_stream(mut stream: TcpStream) {
+fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
     println!("request recieved");
     let mut reader = BufReader::new(&mut stream);
 
@@ -318,7 +327,7 @@ fn handle_stream(mut stream: TcpStream) {
     }
 
     let (status_line, content_type, response_body) =
-        handle_request(request_line.as_str(), body_content.as_str());
+        handle_request(request_line.as_str(), body_content.as_str(), api_keys);
 
     let length = response_body.len();
     let response = format! {
@@ -333,7 +342,11 @@ Content-Length: {length}\r\n\r\n\
     println!("response sent");
 }
 
-fn handle_request(request_line: &str, body_content: &str) -> (String, String, String) {
+fn handle_request(
+    request_line: &str,
+    body_content: &str,
+    api_keys: &structs::APIKeys,
+) -> (String, String, String) {
     let (request_code, file_name) = match extract_file_name(request_line) {
         Some((file_type, file_name)) => (format!("{file_type}"), file_name),
         None => (String::from(request_line.trim_end()), String::from("")),
@@ -395,6 +408,38 @@ fn handle_request(request_line: &str, body_content: &str) -> (String, String, St
             }
         }
         // TODO: geocoding api handle
+        "POST /locationData" => {
+            // I have city name, state code in a json
+            let location: structs::UserEnteredLocation =
+                serde_json::from_str(body_content).expect("invalid location json file");
+            let response = match api_service::geocoding(
+                location.city.as_str(),
+                location.state.as_str(),
+                api_keys.geocoding.as_str(),
+            ) {
+                Ok((lat, lon)) => {
+                    let wp_name = format!("{}, {}", location.city, location.state);
+                    let wp = structs::Waypoint {
+                        id: 0,
+                        name: wp_name,
+                        latitude: lat as f64,
+                        longitude: lon as f64,
+                    };
+                    (
+                        "HTTP/1.1 200 Ok",
+                        "application/json",
+                        serde_json::to_string(&wp).expect("Incorrect lat and lon"),
+                    )
+                }
+                Err(e) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    String::from("Invalid location"),
+                ),
+            };
+
+            response
+        }
         // TODO: directions api handle
         // TODO: static map with routes handle
         // TODO: static map with user location handle

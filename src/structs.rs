@@ -1,3 +1,5 @@
+use serde::{Deserialize, Serialize};
+
 #[derive(Debug, Clone)]
 pub struct User {
     pub username: String,
@@ -17,7 +19,7 @@ pub struct Route {
     pub wp: Vec<Waypoint>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct Waypoint {
     pub id: i32,
     pub name: String,
@@ -71,4 +73,16 @@ pub struct RouteWithDirections {
     pub waypoints: Vec<(f32, f32)>,
     pub directions: Vec<String>,
     pub geometry: String,
+}
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct UserEnteredLocation {
+    pub city: String,
+    pub state: String,
+}
+
+#[derive(Debug, Clone)]
+pub struct APIKeys {
+    pub geocoding: String,
+    pub mapbox: String,
 }

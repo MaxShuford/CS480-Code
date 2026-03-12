@@ -31,7 +31,11 @@ const getFavorites = (ActionEvent) => {
 const removeFavorite = (ActionEvent) => {
 
     console.log(ActionEvent.value);
+<<<<<<< HEAD
     const postData = {uid:localStorage.getItem("userID")};
+=======
+    //const postData = {uid:localStorage.getItem("userID"), route_id:/*routeID*/};
+>>>>>>> fa4b1dc6531d06dad1c9f7fb3f10312dfca0f2bd
     fetch('/delFavorite', {
     method: 'POST', // Specify the method
     headers: {
@@ -127,7 +131,7 @@ const createFavorite = (name, routeID) => {
     const goButton = document.createElement("input");
     goButton.type = "button";
     goButton.value = "GO";
-    goButton.classList.add("button");
+    goButton.classList.add("buttons");
     fullDiv.id = "FavRoute";
     secondHalfDiv.appendChild(goButton)
 

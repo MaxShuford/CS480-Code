@@ -8,15 +8,7 @@ aside{
     float: right;
     width: 30%;
     padding: 20px 0px;
-
-    /*
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    */
     text-align: center;
-
 }
 
 form{
@@ -42,17 +34,16 @@ form{
     margin-right: 27%;
 }
 
+/*Buttons CSS*/
+
 .buttons{
-    height: 30px;
-    width: 200px;
-    margin-left: 25%;
+    border-radius: 15px;
 }
 
-#theMap{
-    height: 800px;
-    width: 1000px;
-    border: 5px solid black;
-
+#GetRoute{
+    height: 30px;
+    width: 200px;
+    margin-left: 25%; 
 }
 
 #wayAdd{
@@ -61,6 +52,13 @@ form{
     float: left;
     margin-left: 1em;
     margin-top: 3px;
+}
+
+#theMap{
+    height: 800px;
+    width: 1000px;
+    border: 5px solid black;
+
 }
 
 #endTextbox{
@@ -117,7 +115,7 @@ form{
     color:red;
 }
 
-.FavPartTwo .button{
+.FavPartTwo .buttons{
     height: 30px;
     width: 50px;
     
