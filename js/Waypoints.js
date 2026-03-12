@@ -6,7 +6,7 @@ const $$ = selector => document.querySelector(selector);
 let numOfWaypoints = 0;
 
 const getRoutes = () => {
-
+    const allWaypoints =  document.querySelectorAll(".cityBox");
     console.log("Calulating Routes");
 
     const startBox = $$("[name=startCity]");
@@ -26,22 +26,15 @@ const getRoutes = () => {
     console.log(validStart);
     console.log(validEnd);
     //Check if the city input had valid format
-    if(!validStart || !validEnd){
-        alert('INVALID FORMAT');
-    }
-    else if(validStart && validEnd)
-    {
-        numOfWaypoints = 2;
-    }
-
-    if(numOfWaypoints > 0){
-        const allWaypoints =  document.querySelectorAll(".waypoints");
+    console.log(allWaypoints.length)
+    if(allWaypoints.length > 0){
+        
         let waypointOBJ;
         for(let i = 0; i < allWaypoints.length; i++){
 
             //get current waypoint value
             let wpCity = allWaypoints[i].value;
-            console.log(wpCity + "Waypoint " + i);
+            console.log(wpCity + " Waypoint " + i);
 
             if(!(wpCity.includes(", "))){
                 alert("Invalid Format");
@@ -49,7 +42,8 @@ const getRoutes = () => {
             }
             
             //get lat and long for waypoint
-            wpSplit = wpCity.split(",");
+            const wpSplit = wpCity.split(", ");
+            console.log(wpSplit);
             const postData = {city:wpSplit[0], state:wpSplit[1]};
             fetch('/locationData', {
             method: 'POST', // Specify the method
