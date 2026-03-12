@@ -31,7 +31,7 @@ const getFavorites = (ActionEvent) => {
 const removeFavorite = (ActionEvent) => {
 
     console.log(ActionEvent.value);
-    const postData = {uid:localStorage.getItem("userID"), route_id:/*routeID*/};
+    //const postData = {uid:localStorage.getItem("userID"), route_id:/*routeID*/};
     fetch('/delFavorite', {
     method: 'POST', // Specify the method
     headers: {
@@ -127,7 +127,7 @@ const createFavorite = () => {
     const goButton = document.createElement("input");
     goButton.type = "button";
     goButton.value = "GO";
-    goButton.classList.add("button");
+    goButton.classList.add("buttons");
     fullDiv.id = "FavRoute";
     secondHalfDiv.appendChild(goButton)
 

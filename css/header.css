@@ -57,6 +57,14 @@ li a{
 
 }
 
+#firstBar{
+    border-radius: 15px;
+}
+
+#firstBar:hover{
+    border-radius: 15px 15px 0 0;
+}
+
 #firstBar ul{
     margin: 0;
     padding: 0;
