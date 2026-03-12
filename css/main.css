@@ -9,10 +9,12 @@ aside{
     width: 30%;
     padding: 20px 0px;
 
+    /*
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    */
     text-align: center;
 
 }
@@ -65,3 +67,82 @@ form{
     margin-bottom: 2em;
     height: 30px;
 }
+
+#accordion{
+    width: 400px;
+    margin-top: 2em;
+
+    text-align: left;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#favorites, ul{
+    padding: 0;
+    margin: 0;
+}
+
+#favorites ul li{
+    width: 395px;
+
+    border: 2px solid black;
+    list-style: none;
+}
+
+.FavPartOne .arrow{
+    transform: rotate(180deg);
+
+    height: 50px;
+    width: 50px;
+
+    margin: 20px 5%;
+
+    padding: 0;
+}
+
+.FavPartTwo .trash{
+    height: 30px;
+    width: 30px;
+
+    /*
+    margin-top: 20px;
+    */
+    margin-top: 30px;
+    margin-right: 5%;
+    margin-bottom: 20px;
+    margin-left: auto;
+
+    padding: 0;
+
+    color:red;
+}
+
+.FavPartTwo .button{
+    height: 30px;
+    width: 50px;
+    
+    margin: 30px 5%;  
+
+}
+.FavPartOne{
+    margin-left: 1em;
+}
+.FavPartTwo{
+    margin-left: auto;
+}
+li div{
+    display: inline-flex;
+    width: inherit;
+}
+
+.FavPartOne span{
+    white-space: nowrap;
+    width: auto;
+    padding: 0, 5%;
+    margin: 35px auto;
+    font-size: 15px;
+}
+
+
+
+

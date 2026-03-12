@@ -1,7 +1,7 @@
 "use strict";
 
 // $ function 
-const $ = selector => document.querySelector(selector);
+const $$ = selector => document.querySelector(selector);
 
 let numOfWaypoints = 0;
 
@@ -9,8 +9,8 @@ const getRoutes = () => {
 
     console.log("Calulating Routes");
 
-    const startBox = $("[name=startCity]");
-    const destinationBox = $("[name=destinationCity]");
+    const startBox = $$("[name=startCity]");
+    const destinationBox = $$("[name=destinationCity]");
 
 
     const startCity = startBox.value;
@@ -62,7 +62,7 @@ const createWaypoint = () => {
     //Increase increment
     numOfWaypoints++;
 
-    const endBox = $("#endTextbox");
+    const endBox = $$("#endTextbox");
 
     //Create a new div element
     const newDiv = document.createElement("div");
@@ -88,15 +88,27 @@ const createWaypoint = () => {
     endBox.insertAdjacentElement('beforebegin', newDiv);
 
     if(numOfWaypoints == 5){
-        const addButton = $("#wayAdd");
+        const addButton = $$("#wayAdd");
         addButton.remove();
     }
 
 }
 
+//Runs accordian function
+$(document).ready(function(){
+        
+        //creates an accordian at id=accordian
+        $("#accordion").accordion({ 
+                event: "click",         //when click, it expense the accordian
+                heightStyle: "content", //the height of the accordian
+                collapsible: true,      //make all of them collapsible
+                active:false,           //make sure when loaded, all links are closed
+        });
+});
+
 //DomContentLoaded
 document.addEventListener("DOMContentLoaded", () =>{
-    $("#GetRoute").addEventListener("click", getRoutes);
-    $("#wayAdd").addEventListener("click", createWaypoint);
-    $("[name=startCity]").focus();  
+    $$("#GetRoute").addEventListener("click", getRoutes);
+    $$("#wayAdd").addEventListener("click", createWaypoint);
+    $$("[name=startCity]").focus();  
 });
