@@ -29,9 +29,11 @@ fn serve_static_file(path: &str) {
     // TODO: read file and return HTTP response?
 }
 
-// === Helper ===
-// Extract file name from GET request line, ex: "GET /html/Login.html HTTP/1.1" -> "Login.html"
-fn extract_html_file_name(request_line: &str) -> Option<&str> {
+// === Helper === 
+// Extract file name from GET request line, ex: "GET /html/Login.html" -> ("GET/html", "Login.html")
+// "GET/html" will be used for matching and "Login.html" will be used for file retrieving
+// 3 match conditions and 3 ways to retrieve files
+fn extract_file_name(request_line: &str) -> Option<(String, String)> {
     let mut parts = request_line.split_whitespace();
     let method = parts.next()?;
     let path = parts.next()?;
@@ -40,7 +42,20 @@ fn extract_html_file_name(request_line: &str) -> Option<&str> {
         return None;
     }
 
-    path.strip_prefix("/html/")
+    // Support three static prefixes: /html/, /js/, /css/
+    // Extract the prefix and the rest of the path
+    let (prefix, rest) = if let Some(rest) = path.strip_prefix("/html/") {
+        ("/html", rest)
+    } else if let Some(rest) = path.strip_prefix("/js/") {
+        ("/js", rest)
+    } else if let Some(rest) = path.strip_prefix("/css/") {
+        ("/css", rest)
+    } else {
+        return None;
+    };
+
+    let match_key = format!("{} {}", method, prefix); // ex: "GET /html"
+    Some((match_key, rest.to_string()))
 }
 
 // === API Handlers ===
@@ -125,7 +140,7 @@ fn main() {
     route_request("GET", "/nonexistent");
 
     let raw = "GET /html/Login.html HTTP/1.1";
-    if let Some(file) = extract_html_file_name(raw) {
+    if let Some(file) = extract_file_name(raw) {
         println!("Extracted file name: {}", file);
     }
 }
