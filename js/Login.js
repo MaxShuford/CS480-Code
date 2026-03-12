@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(validUsername && validPassword)
         {
             login(username.value, password.value);
+            $("#login").submit();
         }
     });
 });

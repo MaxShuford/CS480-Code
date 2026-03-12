@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(validOldPassword && validNewPassword && validConfirmPassword)
         {
             changePassword(localStorage.getItem("userID"), oldPassword.value, newPassword.value);
+            $("#changePassword").submit();
         }
     });
 });
