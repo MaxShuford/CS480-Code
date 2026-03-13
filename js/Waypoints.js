@@ -115,7 +115,7 @@ const createWaypoint = () => {
     //Create a new text input element
     newInput.classList.add("cityBox");
     newInput.classList.add("waypoints");
-    newInput.placeholder = "Waypoint " + numOfWaypoints;
+    newInput.placeholder = "Waypoint " + (numOfWaypoints-1);
 
     //Create a new img element
     const newImg = document.createElement("img");
