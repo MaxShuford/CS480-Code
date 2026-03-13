@@ -446,6 +446,7 @@ fn handle_request(
 
         // TODO: handle login with db
         // login handle
+        /*
         "POST /login HTTP/1.1" => {
             let credentials: structs::User =
                 serde_json::from_str(body_content).expect("Invalid login credentials json");
@@ -470,6 +471,7 @@ fn handle_request(
             };
             response
         }
+        */
         // TODO: test create account with db
         /*
             // create account handle
