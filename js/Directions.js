@@ -42,6 +42,12 @@ function showDirections()
     for (let i = 0; i < routes.directions.length; i++){
         const newLi = document.createElement("li");
         newLi.textContent = routes.directions[i];
+
+        if(i % 2 == 0)
+            newLi.classList.add("evenItem");
+        else
+            newLi.classList.add("oddItem");
+
         $("aside ul").appendChild(newLi);
     }
 }
