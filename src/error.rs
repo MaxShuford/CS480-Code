@@ -9,8 +9,12 @@ pub enum Error {
     InvalidLocation,
 
     // -- user model errors
-    LoginFailed { username: String },
-    UserExists { username: String },
+    LoginFailed {
+        username: String,
+    },
+    UserExists {
+        username: String,
+    },
     IncorrectPassword,
 
     // -- favorite model errors

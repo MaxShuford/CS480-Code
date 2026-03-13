@@ -3,10 +3,6 @@ mod error;
 mod routes;
 pub mod structs;
 
-mod user_model;
-
-use crate::error::Error::LoginFailed;
-
 use std::{
     fs,
     io::{BufReader, prelude::*},
@@ -446,30 +442,6 @@ fn handle_request(
         }
 
         // TODO: login handle
-        "POST /login HTTP/1.1" => {
-            let credentials: structs::User =
-                serde_json::from_str(body_content).expect("Invalid login credentials json");
-            let response = match user_model::login(credentials) {
-                Ok(uuid) => (
-                    "HTTP/1.1 200 Ok",
-                    "application/json",
-                    String::from(format!("{{\"uuid\":{}}}", uuid)),
-                ),
-                Err(LoginFailed {
-                    username: err_string,
-                }) => (
-                    "HTTP/1.1 400 Bad Request",
-                    "text/plain",
-                    String::from(format!("{err_string} failed to login")),
-                ),
-                Err(_) => (
-                    "HTTP/1.1 500 Internal Server Error",
-                    "text/plain",
-                    String::from("An error occurred during login"),
-                ),
-            };
-            response
-        }
         // TODO: create account handle
         // TODO: change password handle
         // TODO: add favorite handle

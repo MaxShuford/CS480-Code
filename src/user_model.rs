@@ -11,14 +11,16 @@ pub fn login(input: User) -> AppResult<i64> {
     let mut conn = pool.get_conn().expect("Failed to get database connection");
 
     //get user id and password from db
-    let row: Option<(i64, String)> = conn.exec_first(
-        "SELECT user_id, `password` 
+    let row: Option<(i64, String)> = conn
+        .exec_first(
+            "SELECT user_id, `password` 
         FROM `user` 
         WHERE username = :usrnm;",
-        params! {
-            "usrnm" => &input.username
-        },
-    )?;
+            params! {
+                "usrnm" => &input.username
+            },
+        )
+        .expect("Failed to query for login");
 
     //unpack option
     if let Some((user_id, db_pw)) = row {
@@ -38,12 +40,14 @@ pub fn login(input: User) -> AppResult<i64> {
 //function to create account
 pub fn create_account(conn: &mut PooledConn, input: User) -> AppResult<i64> {
     //query database for account
-    let account: Option<i64> = conn.exec_first(
-        "SELECT user_id FROM `user` WHERE username = :usrnm;",
-        params! {
-            "usrnm" => &input.username
-        },
-    )?;
+    let account: Option<i64> = conn
+        .exec_first(
+            "SELECT user_id FROM `user` WHERE username = :usrnm;",
+            params! {
+                "usrnm" => &input.username
+            },
+        )
+        .expect("Failed to query for create account");
 
     //if the account exists, we throw an error
     if account.is_some() {
@@ -60,7 +64,8 @@ pub fn create_account(conn: &mut PooledConn, input: User) -> AppResult<i64> {
             "usrnm" => &input.username,
             "pw" => &input.pw_hash
         },
-    )?;
+    )
+    .expect("failed to query for create account");
 
     //get user id
     let id = conn.last_insert_id() as i64;
@@ -71,14 +76,16 @@ pub fn create_account(conn: &mut PooledConn, input: User) -> AppResult<i64> {
 //function to change password
 pub fn change_pass(conn: &mut PooledConn, input: ChangePassword) -> AppResult<i32> {
     //get password from db
-    let db_pw: Option<String> = conn.exec_first(
-        "SELECT `password` 
+    let db_pw: Option<String> = conn
+        .exec_first(
+            "SELECT `password` 
         FROM `user` 
         WHERE user_id = :uid;",
-        params! {
-            "uid" => &input.uuid
-        },
-    )?;
+            params! {
+                "uid" => &input.uuid
+            },
+        )
+        .expect("failed to query for change password");
 
     //unpack option
     if let Some(current_pw) = db_pw {
@@ -93,7 +100,8 @@ pub fn change_pass(conn: &mut PooledConn, input: ChangePassword) -> AppResult<i3
                     "new_pass" => &input.new_pw,
                     "uid" => &input.uuid
                 },
-            )?;
+            )
+            .expect("failed to query for change passowrd");
 
             //return success
             return Ok(1);
@@ -103,4 +111,3 @@ pub fn change_pass(conn: &mut PooledConn, input: ChangePassword) -> AppResult<i3
     //return error if user not found or incorrect password
     Err(IncorrectPassword)
 }
-
