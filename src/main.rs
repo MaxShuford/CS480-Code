@@ -432,6 +432,7 @@ fn handle_request(
                         String::from("Unable to map"),
                     ),
                 };
+            println!("Map generated");
             response
         }
         // requesting a map centered around the users location
@@ -457,6 +458,7 @@ fn handle_request(
                         String::from("Unable to map user location"),
                     ),
                 };
+            println!("Map generated");
             response
         }
 
