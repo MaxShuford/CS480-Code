@@ -187,7 +187,7 @@ pub fn static_images_with_user_loc(location: (f32, f32), api_key: &str) -> AppRe
     let lon = location.1;
     let lat = location.0;
     let api_call_str = format!(
-        "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{lon},{lat},2/400x400?access_token={api_key}"
+        "https://api.mapbox.com/styles/v1/mapbox/streets-v12/static/{lon},{lat},10/400x400?access_token={api_key}"
     );
 
     let api_result = api_call(api_call_str.as_str())?;
