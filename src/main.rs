@@ -126,12 +126,17 @@ fn main() {
         mapbox: mapbox.to_string(),
     };
 
+    // setup db
+    let url = "mysql://root:root@localhost:3306/mooglegaps";
+    let pool = Pool::new(url).expect("Failed to create database pool");
+
     // listen to local hosted
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
-        handle_stream(stream, &api_keys);
+        let mut conn = pool.get_conn().expect("Failed to get database connection");
+        handle_stream(stream, &api_keys, conn);
     }
 
     route_request("GET", "/html/Login.html");
@@ -146,7 +151,7 @@ fn main() {
     if let Some(file) = extract_file_name(raw) {}
 }
 
-fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
+fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys, mut conn: mysql::PooledConn) {
     println!("request recieved");
     let mut reader = BufReader::new(&mut stream);
 
@@ -254,7 +259,7 @@ Content-Length: {length}\r\n\r\n"};
     }
 
     let (status_line, content_type, response_body) =
-        handle_request(request_line.as_str(), body_content.as_str(), api_keys);
+        handle_request(request_line.as_str(), body_content.as_str(), api_keys, conn);
 
     let length = response_body.len();
     let response = format! {
@@ -274,17 +279,13 @@ fn handle_request(
     request_line: &str,
     body_content: &str,
     api_keys: &structs::APIKeys,
+    mut conn: mysql::PooledConn,
 ) -> (String, String, String) {
     let (request_code, file_name) = match extract_file_name(request_line) {
         Some((file_type, file_name)) => (format!("{file_type}"), file_name),
         None => (String::from(request_line.trim_end()), String::from("")),
     };
     println!("Request Code: {request_code}, File_name: {file_name}");
-
-    let url = "mysql://root:root@localhost:3306/mooglegaps";
-    // TODO: Test dbc connecter with db
-    let pool = Pool::new(url).expect("Failed to create database pool");
-    let mut conn = pool.get_conn().expect("Failed to get database connection");
 
     let (status_code, content_type, body) = match &request_code[..] {
         // Initial page request
