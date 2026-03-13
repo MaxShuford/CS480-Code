@@ -147,9 +147,7 @@ const showUserLocation = () => {
     })
     .then(response => response.json())
     .then(data => {
-    console.log('Success:', data);
-    const image = JSON.parse(data).image
-    $("img").src = "data:image/png;base64," + image;
+    $$("#theMap").src = "data:image/png;base64,"+data.image;
     })
     .catch((error) => {
     console.error('Error:', error);
