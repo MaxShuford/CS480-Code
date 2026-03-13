@@ -180,13 +180,6 @@ pub fn static_images_with_routes(routes: Vec<RouteToMap>, api_key: &str) -> AppR
     );
     let api_result = api_call(api_call_str.as_str())?;
 
-    // NOTE: TEMP
-    let img = load_from_memory(&api_result).expect("Failed to load image from mem");
-    let mut file = File::create("mapbox_result.png").expect("Failed to create file");
-    img.write_to(&mut file, image::ImageFormat::Png)
-        .expect("Failed to write img to file");
-    // NOTE: END TEMP
-
     Ok(general_purpose::STANDARD.encode(&api_result))
 }
 
@@ -198,13 +191,6 @@ pub fn static_images_with_user_loc(location: (f32, f32), api_key: &str) -> AppRe
     );
 
     let api_result = api_call(api_call_str.as_str())?;
-
-    // NOTE: TEMP
-    let img = load_from_memory(&api_result).expect("Failed to load image from mem");
-    let mut file = File::create("mapbox_result.png").expect("Failed to create file");
-    img.write_to(&mut file, image::ImageFormat::Png)
-        .expect("Failed to write img to file");
-    // NOTE: END TEMP
 
     Ok(general_purpose::STANDARD.encode(&api_result))
 }
