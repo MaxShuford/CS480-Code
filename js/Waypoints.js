@@ -3,7 +3,7 @@
 // $ function 
 const $$ = selector => document.querySelector(selector);
 
-let numOfWaypoints= 2;
+let numOfWaypoints= 0;
 
 const getRoutes = () => {
     const allWaypoints =  document.querySelectorAll(".cityBox");
@@ -115,7 +115,7 @@ const createWaypoint = () => {
     //Create a new text input element
     newInput.classList.add("cityBox");
     newInput.classList.add("waypoints");
-    newInput.placeholder = "Waypoint " + (numOfWaypoints-1);
+    newInput.placeholder = "Waypoint " + numOfWaypoints;
 
     //Create a new img element
     const newImg = document.createElement("img");
