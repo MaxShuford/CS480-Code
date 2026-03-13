@@ -1,13 +1,14 @@
-/*
-:root{
-    --orange: #bd7a0b;
-    --cyan: #15bcca;
-    --purple: #cb57ac;
-    --blue:#0443fa;
 
-    --background-color: gray;
+:root{
+    --cyan: #1299a4;
+    --cyan-border: #7be2ea;
+    --purple-border: #d97abf;
+    --purple: #942877;
+
+    --background-color: #141929;
+    --text-color: rgb(236, 236, 236);
 }
-*/
+
 html{
     width: 1536px;
     background: var(--background-color);
@@ -39,6 +40,8 @@ form{
     background-size: 30px auto;
     background-repeat: no-repeat;
     padding-left: 30px;
+
+    border: 3px solid var(--purple-border);
 }
 
 .arrow{
@@ -47,12 +50,28 @@ form{
     transform: rotate(-90deg);
     margin: .5em 0;
     margin-right: 27%;
+
+    filter: brightness(0) invert(1);
 }
 
 /*Buttons CSS*/
 
 .buttons{
     border-radius: 15px;
+    background-color: var(--cyan);
+    border: 3px solid var(--cyan-border);
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+.buttons:hover{
+    background-color: var(--cyan-border);
+    border: 3px solid var(--cyan);
+
+}
+
+#title{
+    color: var(--text-color);
 }
 
 #GetRoute{
@@ -72,7 +91,8 @@ form{
 #theMap{
     height: 800px;
     width: 1000px;
-    border: 5px solid black;
+    border: 5px solid var(--purple-border);
+    
 
 }
 
@@ -89,6 +109,17 @@ form{
     font-size: 20px;
     font-weight: bold;
 }
+#accordion h3{
+    background-color: var(--cyan);
+    border: 3px solid var(--cyan-border);
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+#accordion .ui-state-active{
+    background-color: var(--cyan-border);
+    border: 3px solid var(--cyan);
+}
 
 #favorites, ul{
     padding: 0;
@@ -99,6 +130,9 @@ form{
     width: 395px;
 
     border: 2px solid black;
+    background-color: var(--cyan);
+    border: 3px solid var(--cyan-border);
+
     list-style: none;
 }
 
@@ -136,7 +170,18 @@ form{
     
     margin: 30px 5%;  
 
+    background-color: var(--purple);
+    border: 3px solid var(--purple-border);
+
 }
+
+.FavPartTwo .buttons:hover{
+    background-color: var(--purple-border);
+    border: 3px solid var(--purple);
+
+}
+
+
 .FavPartOne{
     margin-left: 1em;
 }

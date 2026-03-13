@@ -1,3 +1,13 @@
+:root{
+    --cyan: #1299a4;
+    --cyan-border: #7be2ea;
+    --purple-border: #d97abf;
+    --purple: #942877;
+
+    --background-color: #141929;
+    --text-color: rgb(236, 236, 236);
+}
+
 h1{
     font-size: 50px;
     text-align: center;
@@ -21,6 +31,7 @@ h1{
     float: right;
     margin-right: 1em;
     margin-top: 5px;
+    filter: brightness(0) invert(1);
 }
 
 #profileIcon ul{
@@ -36,8 +47,9 @@ h1{
     text-align: center;
     text-decoration: none;
     font-weight: bold;
-    background-color: azure;
-    box-shadow: inset 0 0 0 2px black; /* Simulates a 2px inner border */
+    background-color: var(--cyan);
+    box-shadow: inset 0 0 0 2px var(--cyan-border); 
+    color: var(--text-color);
     height: 50px;
     position: relative;
 
@@ -48,7 +60,7 @@ h1{
 li a{
     line-height: 50px;
     text-decoration: none;
-    color: rgb(5, 37, 38);
+    color: var(--text-color);
 }
 
 #profileDrop{
@@ -97,17 +109,18 @@ li a{
 
 .backButton h2{
     margin: 0;
-    color: black;
+    color: var(--purple);
 }
 
 .backButton:hover h2{
-    color:rgb(10, 106, 93);
+    color:var(--purple-border);
 }
 
 
 #backIcon{
     height: 30px;
     width: 30px;
+    filter: brightness(0%) invert(100%) sepia(100%) saturate(100000%) hue-rotate(200deg) brightness(40%) saturate(350%); ;
 }
 
 .backButton + #title{
