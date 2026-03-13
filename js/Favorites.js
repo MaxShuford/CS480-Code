@@ -218,36 +218,12 @@ const createFavorite = (name, routeID) => {
 //DomContentLoaded
 /*
 document.addEventListener("DOMContentLoaded", () =>{
-
-
-    //GET FAVORITES FROM DB HERE
-    const postData = {uid:localStorage.getItem("userID")};
-    fetch('/retrieveFavorites', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
-    })
-    .then(response => response.json())
-    .then(data => {
-    console.log('Success:', data);
-    favorites = JSON.parse(data);
-    })
-    .catch((error) => {
-    console.error('Error:', error);
-    });
-    //CREATE FAVORITES ITEMS HERE
-    for(let i = 0; i < favorites.names.length; i++)
-    {
-        createFavorite(favorites.name[i], favorites.route_id[i]);
-    }
     //Get all the add and trash buttons and give them their function.
     const allAddButtons = document.querySelectorAll("#FavRoute");
     const allTrashButtons = document.querySelectorAll(".trash")
-
+    document.querySelector(#accordion).getFavorites();
     for(let i = 0; i < allAddButtons.length; i++){
-        allAddButtons[i].addEventListener("click", getFavorites);
+        allAddButtons[i].addEventListener("click", getFavorite);
         allTrashButtons[i].addEventListener("click", removeFavorite);
     }
 });
