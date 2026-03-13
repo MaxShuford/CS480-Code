@@ -5,7 +5,6 @@ pub mod structs;
 mod user_model;
 
 use error::Error::*;
-use mysql::*;
 
 use std::{
     fs,
@@ -126,17 +125,12 @@ fn main() {
         mapbox: mapbox.to_string(),
     };
 
-    // setup db
-    let url = "mysql://root:root@localhost:3306/mooglegaps";
-    let pool = Pool::new(url).expect("Failed to create database pool");
-
     // listen to local hosted
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
-        let mut conn = pool.get_conn().expect("Failed to get database connection");
-        handle_stream(stream, &api_keys, conn);
+        handle_stream(stream, &api_keys);
     }
 
     route_request("GET", "/html/Login.html");
@@ -151,7 +145,7 @@ fn main() {
     if let Some(file) = extract_file_name(raw) {}
 }
 
-fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys, mut conn: mysql::PooledConn) {
+fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
     println!("request recieved");
     let mut reader = BufReader::new(&mut stream);
 
@@ -259,7 +253,7 @@ Content-Length: {length}\r\n\r\n"};
     }
 
     let (status_line, content_type, response_body) =
-        handle_request(request_line.as_str(), body_content.as_str(), api_keys, conn);
+        handle_request(request_line.as_str(), body_content.as_str(), api_keys);
 
     let length = response_body.len();
     let response = format! {
@@ -279,7 +273,6 @@ fn handle_request(
     request_line: &str,
     body_content: &str,
     api_keys: &structs::APIKeys,
-    mut conn: mysql::PooledConn,
 ) -> (String, String, String) {
     let (request_code, file_name) = match extract_file_name(request_line) {
         Some((file_type, file_name)) => (format!("{file_type}"), file_name),
@@ -456,7 +449,7 @@ fn handle_request(
         "POST /login HTTP/1.1" => {
             let credentials: structs::User =
                 serde_json::from_str(body_content).expect("Invalid login credentials json");
-            let response = match user_model::login(&mut conn, credentials) {
+            let response = match user_model::login(credentials) {
                 Ok(uuid) => (
                     "HTTP/1.1 200 Ok",
                     "application/json",
