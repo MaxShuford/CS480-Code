@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct User {
     pub username: String,
     pub pw_hash: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct ChangePassword {
     pub uuid: i64,
     pub old_pw: String,
@@ -50,7 +50,7 @@ pub struct Favorite {
     pub route_id: i32,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FavoriteReturn {
     pub name: String,
     pub route_id: i32,
@@ -103,3 +103,4 @@ pub struct UserLocation {
 pub struct FavoritesList {
     pub favorites: Vec<FavoriteReturn>,
 }
+
