@@ -30,7 +30,7 @@ pub struct Waypoint {
 #[derive(Debug, Clone, Deserialize)]
 pub struct AddFavorite {
     pub uuid: i64,
-    pub route: Route,
+    pub wp: Vec<Waypoint>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
