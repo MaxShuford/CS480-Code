@@ -20,20 +20,89 @@ const getFavorites = (ActionEvent) => {
     .then(data => {
     console.log('Success:', data);
     favorites = data;
+    for(let i = 0; i < favorites.names.length; i++)
+    {
+        createFavorite(favorites.name[i], favorites.route_id[i]);
+    }
     })
     .catch((error) => {
     console.error('Error:', error);
     });
-
 }
 
+const getFavorite = (Event) => {
+    const postData = {uid:localStorage.getItem("userID"), route_id:Event.target.id};
+     fetch('/retrieveFavorite', {
+    method: 'POST', // Specify the method
+    headers: {
+        'Content-Type': 'application/json', // Inform the server the body is JSON
+    },
+    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+    })
+    .then(response => response.json())
+    .then(data => {
+    console.log('Success:', data);
+    for(let i = 0; i < data.waypoints.length; i++)
+    {
+        const wpcity = data.waypoints[i];
+        const wpSplit = wpCity.split(", ");
+        console.log(wpSplit);
+        const postData = {city:wpSplit[0], state:wpSplit[1]};
+        fetch('/locationData', {
+                method: 'POST', // Specify the method
+                headers: {
+                    'Content-Type': 'application/json', // Inform the server the body is JSON
+                },
+                body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    waypointOBJ[i] = data;
+                    waypointOBJ[i].id = i;
+                    console.log(waypointOBJ[i]);
+                    console.log("i: ", i, "num:", allWaypoints.length);
+                    if(i == data.waypoints.length-1)
+                    {
+                        localStorage.setItem("start", waypointOBJ[0].name);
+                        localStorage.setItem("destination", waypointOBJ[allWaypoints.length-1].name)
+                        //get the directions for the routes
+                        const postData = waypointOBJ;
+                        console.log("post data:", postData);
+                        fetch('/directions', {
+                        method: 'POST', // Specify the method
+                        headers: {
+                            'Content-Type': 'application/json', // Inform the server the body is JSON
+                        },
+                        body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                        console.log('Success:', data);
+                        localStorage.setItem("routes", JSON.stringify(data.routes));
+                        console.log("saved route", data.routes);
+                        window.location.href ="/html/Route.html";
+                        })
+                        .catch((error) => {
+                        console.error('Error:', error);
+                        });
+                    }
+                })
+                .catch((error) => {
+                console.error('Error:', error);
+                });
+        }
+        })
+        .catch((error) => {
+        console.error('Error:', error);
+        });
+}
 
 const removeFavorite = (ActionEvent) => {
 
     console.log(ActionEvent.value);
-    const postData = {uid:localStorage.getItem("userID")};
 
-    //const postData = {uid:localStorage.getItem("userID"), route_id:/*routeID*/};
+    const postData = {uid:localStorage.getItem("userID"), route_id:ActionEvent.target.id};
 
     fetch('/delFavorite', {
     method: 'POST', // Specify the method
@@ -45,6 +114,7 @@ const removeFavorite = (ActionEvent) => {
     .then(response => response.json())
     .then(data => {
     console.log('Success:', data);
+    getFavorites()
     })
     .catch((error) => {
     console.error('Error:', error);
