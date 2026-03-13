@@ -146,6 +146,7 @@ const createFavorite = (name, routeID) => {
 }
 
 //DomContentLoaded
+/*
 document.addEventListener("DOMContentLoaded", () =>{
 
 
@@ -180,3 +181,4 @@ document.addEventListener("DOMContentLoaded", () =>{
         allTrashButtons[i].addEventListener("click", removeFavorite);
     }
 });
+*/

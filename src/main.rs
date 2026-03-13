@@ -1,12 +1,7 @@
 mod api_service;
 mod error;
-mod favorite_model;
 mod routes;
 pub mod structs;
-mod user_model;
-
-use error::Error::*;
-use mysql::*;
 
 use std::{
     fs,
@@ -78,6 +73,141 @@ fn extract_file_name(request_line: &str) -> Option<(String, String)> {
     println!("{match_key}");
     Some((match_key, rest.to_string()))
 }
+
+// === API Handlers ===
+/*
+fn handle_login(request_body: &str) -> String {
+    println!("POST /login");
+
+    let login: LoginRequest = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::login(login) {
+        Ok(uuid) => format!("uuid: {}", uuid),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+
+    response
+}
+
+fn handle_create_account(request_body: &str) -> String {
+    println!("POST /createAccount");
+
+    let create: User = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::create_acct(create) {
+        Ok(code) => format!("Success: {}", code),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+
+    response
+}
+
+fn handle_change_password(request_body: &str) -> String {
+    println!("POST /changePassword");
+
+    let hcp: ChangePassword = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::change_password(hcp) {
+        Ok(code) => formats!("Success: {}", code),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+
+    response
+    // TODO: parse {uuid, oldPassword, newPassword, confirmPassword}, return {error_code}
+}
+
+fn handle_add_favorite(request_body: &str) -> String {
+    println!("POST /addFavorite");
+
+    let addfave: AddFavorite = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::add_favorite(addfave) {
+        Ok(code) => formats!("Success: {}", code),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+
+    response
+    // TODO: parse {uuid, route}, return {error_code}
+}
+
+fn handle_delete_favorite(request_body: &str) -> String {
+    println!("POST /deleteFavorite");
+
+    let delfave: DeleteFavorite = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::delete_favorite(delfave) {
+        Ok(code) => formats!("Success: {}", code),
+        Err(e) => format!("Err processing request: {}", e),
+    };
+
+    response
+    // TODO: parse {uuid, route_id}, return {error_code}
+}
+
+fn handle_retrieve_favorites(request_body: &str) -> String {
+    println!("POST /retrieveFavorites");
+
+    let retfave: RetrieveFavorites = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    match DB::retrieve_favorite(retfave) {
+        Ok(favorites) => {
+            let route_ids: Vec<i32> = favorites.iter().map(|f| f.route_id).collect();
+            let names: Vec<String> = favorites.iter().map(|f| f.name.clone()).collect();
+
+            format!("{{\"route_id\": {:?}, \"names\": {:?}}}", route_ids, names)
+        }
+        Err(e) => format!("Err processing request: {}", e),
+    }
+    // TODO: parse {uuid}, return {route_id: [], names: []}
+}
+
+fn handle_retrieve_favorite(request_body: &str) -> String {
+    println!("POST /retrieveFavorite");
+
+    let retfave: RetrieveFavorites = match serde_json::from_str(request_body) {
+        Ok(data) => data,
+        Err(e) => {
+            return format!("Error parsing request: {}", e);
+        }
+    };
+
+    let response = match DB::retrieve_favorite(retfave) {
+        Ok(route) => format!("Success: {:?}", route), // return route
+        Err(e) => format!("Err processing request: {}", e),
+    };
+    // TODO: parse {uuid, route_id}, return {route: Route}
+}
+*/
 
 fn handle_404() {
     println!("404 Not Found");
@@ -197,75 +327,6 @@ fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
 
     let (status_line, content_type, response_body) =
         handle_request(request_line.as_str(), body_content.as_str(), api_keys);
-    println!("recieved response to pass");
-
-    // read the body
-    let mut body_content = String::new();
-    if content_length > 0 {
-        let mut body = vec![0; content_length];
-        reader.read_exact(&mut body).unwrap();
-        let body = String::from_utf8_lossy(&body);
-        body_content.push_str(body.as_ref());
-        println!("=== Body ===\n{}", body_content);
-    } else {
-        println!("=== No Body ===");
-    }
-
-    /*
-        let request_line = request_line.trim_end().to_string();
-        // hard code image response cuz we need it done :)
-        if &request_line[..] == "GET /css/images/SearchIcon.png HTTP/1.1" {
-            let contents = fs::read("css/Images/SearchIcon.png").unwrap();
-            let content_type = "image/png";
-            let length = contents.len();
-            let response = format! {"HTTP/1.1 200 OK
-Content-Type: {content_type}
-Content-Length: {length}\r\n\r\n"};
-            stream.write(response.as_bytes()).unwrap();
-            stream.write(&contents).unwrap();
-            return;
-        } else if &request_line[..] == "GET /css/Images/UserIcon.png HTTP/1.1" {
-            let contents = fs::read("css/Images/UserIcon.png").unwrap();
-            let content_type = "image/png";
-            let length = contents.len();
-            let response = format! {"HTTP/1.1 200 OK
-Content-Type: {content_type}
-Content-Length: {length}\r\n\r\n"};
-            stream.write(response.as_bytes()).unwrap();
-            stream.write(&contents).unwrap();
-            return;
-        } else if &request_line[..] == "GET /css/Images/ArrowIcon.png HTTP/1.1" {
-            let contents = fs::read("css/Images/ArrowIcon.png").unwrap();
-            let content_type = "image/png";
-            let length = contents.len();
-            let response = format! {"HTTP/1.1 200 OK
-Content-Type: {content_type}
-Content-Length: {length}\r\n\r\n"};
-            stream.write(response.as_bytes()).unwrap();
-            stream.write(&contents).unwrap();
-            return;
-        } else if &request_line[..] == "GET /css/Images/BackIcon.png HTTP/1.1" {
-            let contents = fs::read("css/Images/BackIcon.png").unwrap();
-            let content_type = "image/png";
-            let length = contents.len();
-            let response = format! {"HTTP/1.1 200 OK
-Content-Type: {content_type}
-Content-Length: {length}\r\n\r\n"};
-            stream.write(response.as_bytes()).unwrap();
-            stream.write(&contents).unwrap();
-            return;
-        } else if &request_line[..] == "GET /css/Images/TrashIcon.png HTTP/1.1" {
-            let contents = fs::read("css/Images/TrashIcon.png").unwrap();
-            let content_type = "image/png";
-            let length = contents.len();
-            let response = format! {"HTTP/1.1 200 OK
-Content-Type: {content_type}
-Content-Length: {length}\r\n\r\n"};
-            stream.write(response.as_bytes()).unwrap();
-            stream.write(&contents).unwrap();
-            return;
-        }
-    */
 
     let length = response_body.len();
     let response = format! {
@@ -276,11 +337,8 @@ Content-Length: {length}\r\n\r\n\
     };
     println!("{response}");
 
-    stream.flush().unwrap();
-    match stream.write_all(response.as_bytes()) {
-        Ok(()) => println!("response sent"),
-        Err(e) => println!("failed to send response: reason {e}"),
-    }
+    stream.write_all(response.as_bytes()).unwrap();
+    println!("response sent");
 }
 
 fn handle_request(
@@ -293,14 +351,6 @@ fn handle_request(
         None => (String::from(request_line.trim_end()), String::from("")),
     };
     println!("Request Code: {request_code}, File_name: {file_name}");
-
-    //create database connection
-    let url = "mysql://user:password@localhost:3306/testdb";
-    // TODO: Test dbc connecter with db
-    /*
-        let pool = Pool::new(url).expect("Failed to create database pool");
-        let mut conn = pool.get_conn().expect("Failed to get database connection");
-    */
 
     let (status_code, content_type, body) = match &request_code[..] {
         // Initial page request
@@ -438,7 +488,6 @@ fn handle_request(
                         String::from("Unable to map"),
                     ),
                 };
-            println!("Map generated");
             response
         }
         // requesting a map centered around the users location
@@ -464,187 +513,22 @@ fn handle_request(
                         String::from("Unable to map user location"),
                     ),
                 };
-            println!("Map generated");
             response
         }
 
-        // TODO: test the following matches with db
-        /*
-        // login handle
-        "POST /login HTTP/1.1" => {
-            let credentials: structs::User =
-                serde_json::from_str(body_content).expect("Invalid login credentials json");
-            let response = match user_model::login(&mut conn, credentials) {
-                Ok(uuid) => (
-                    "HTTP/1.1 200 Ok",
-                    "application/json",
-                    String::from(format!("{{\"uuid\":{}}}", uuid)),
-                ),
-                Err(LoginFailed {
-                    username: err_string,
-                }) => (
-                    "HTTP/1.1 400 Bad Request",
-                    "text/plain",
-                    String::from(format!("{err_string} failed to login")),
-                ),
-                Err(_) => (
-                    "HTTP/1.1 500 Internal Server Error",
-                    "text/plain",
-                    String::from("An error occurred during login"),
-                ),
-            };
-            response
-        }
-
-        // create account handle
-        "POST /createAccount HTTP/1.1" => {
-            let credentials: structs::User = serde_json::from_str(body_content)
-                .expect("Invalid create account credentials json");
-            let response = match user_model::create_account(&mut conn, credentials) {
-                Ok(uuid) => (
-                    "HTTP/1.1 200 Ok",
-                    "application/json",
-                    String::from(format!("{{\"uuid\":{}}}", uuid)),
-                ),
-                Err(UserExists {
-                    username: err_string,
-                }) => (
-                    "HTTP/1.1 400 Bad Request",
-                    "text/plain",
-                    String::from(format!("{err_string} already exists.")),
-                ),
-                Err(_) => (
-                    "HTTP/1.1 500 Internal Server Error",
-                    "text/plain",
-                    String::from("An error occurred during account creation"),
-                ),
-            };
-            response
-        }
-
-        // change password handle
-        "POST /changePassword HTTP/1.1" => {
-            let credentials: structs::ChangePassword = serde_json::from_str(body_content)
-                .expect("Invalid change password credentials json");
-            let response = match user_model::change_pass(&mut conn, credentials) {
-                Ok(uid) => (
-                    "HTTP/1.1 200 Ok",
-                    "text/plain",
-                    String::from("Password changed successfully"),
-                ),
-                Err(IncorrectPassword) => (
-                    "HTTP/1.1 400 Bad Request",
-                    "text/plain",
-                    "Incorrect current password".to_string(),
-                ),
-                Err(_) => (
-                    "HTTP/1.1 500 Internal Server Error",
-                    "text/plain",
-                    String::from("An error occurred during password change"),
-                ),
-            };
-            response
-        }
-
-        // add favorite handle
-        "POST /addFavorite HTTP/1.1" => {
-            let favorite: structs::AddFavorite =
-                serde_json::from_str(body_content).expect("Invalid add favorite json");
-            let response = match favorite_model::add_fav(&mut conn, favorite) {
-                Ok(()) => (
-                    "HTTP/1.1 200 Ok",
-                    "text/plain",
-                    String::from("Favorite added successfully"),
-                ),
-                Err(MaxRoutesExceeded) => (
-                    "HTTP/1.1 400 Bad Request",
-                    "text/plain",
-                    String::from("Maximum number of favorite routes exceeded"),
-                ),
-                Err(_) => (
-                    "HTTP/1.1 500 Internal Server Error",
-                    "text/plain",
-                    String::from("An error occurred while adding favorite"),
-                ),
-            };
-            response
-        }
-
-        // delete favorite handle
-        "POST /deleteFavorite HTTP/1.1" => {
-            let favorite: structs::DeleteFavorite =
-                serde_json::from_str(body_content).expect("Invalid delete favorite json");
-            let response = match favorite_model::delete_fav(&mut conn, favorite) {
-                Ok(()) => (
-                    "HTTP/1.1 200 Ok",
-                    "text/plain",
-                    String::from("Favorite deleted successfully"),
-                ),
-                Err(DeleteUnsuccessful) => (
-                    "HTTP/1.1 400 Bad Request",
-                    "text/plain",
-                    String::from("Unable to delete favorite route"),
-                ),
-                Err(_) => (
-                    "HTTP/1.1 500 Internal Server Error",
-                    "text/plain",
-                    String::from("An error occurred while deleting favorite"),
-                ),
-            };
-            response
-        }
-
-        // retrieve favorites handle
-        "POST /retrieveFavorites HTTP/1.1" => {
-            let request: structs::RetrieveFavorites =
-                serde_json::from_str(body_content).expect("Invalid retrieve favorites json");
-            let response = match favorite_model::get_favorites(&mut conn, request) {
-                Ok(favorites) => (
-                    "HTTP/1.1 200 Ok",
-                    "application/json",
-                    serde_json::to_string(&structs::FavoritesList { favorites })
-                        .expect("Failed to serialize favorites"),
-                ),
-                Err(_) => (
-                    "HTTP/1.1 500 Internal Server Error",
-                    "text/plain",
-                    String::from("An error occurred while retrieving favorites"),
-                ),
-            };
-            response
-        }
-
-        // retrieve favorite handle
-        "POST /retrieveFavorite HTTP/1.1" => {
-            let request: structs::Favorite =
-                serde_json::from_str(body_content).expect("Invalid retrieve favorite json");
-            let response = match favorite_model::get_favorite(&mut conn, request) {
-                Ok(route) => (
-                    "HTTP/1.1 200 Ok",
-                    "application/json",
-                    serde_json::to_string(&route).expect("Failed to serialize route"),
-                ),
-                Err(RouteNotFound) => (
-                    "HTTP/1.1 400 Bad Request",
-                    "text/plain",
-                    String::from("Favorite route not found"),
-                ),
-                Err(_) => (
-                    "HTTP/1.1 500 Internal Server Error",
-                    "text/plain",
-                    String::from("An error occurred while retrieving favorite route"),
-                ),
-            };
-            response
-        }
-        */
+        // TODO: login handle
+        // TODO: create account handle
+        // TODO: change password handle
+        // TODO: add favorite handle
+        // TODO: delete favorite handle
+        // TODO: retrieve favorites handle
+        // TODO: retrieve favorite handle
         _ => (
             "HTTP/1.1 404 Not Found",
             "text/plain",
             "Not Found.".to_string(),
         ),
     };
-    println!("{status_code}, {content_type}, {body}");
 
     (String::from(status_code), String::from(content_type), body)
 }
