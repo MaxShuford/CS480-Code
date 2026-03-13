@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if(validOldPassword && validNewPassword && validConfirmPassword)
         {
             changePassword(localStorage.getItem("userID"), oldPassword.value, newPassword.value);
-            $("#changePassword").submit();
+            window.location.href = "/html/Waypoints.html";
         }
     });
 
@@ -27,6 +27,6 @@ const backToWP = () => {
     //What data should be brought back to Waypoints?
 
 
-    location.href = "Waypoints.html";
+    location.href = "/html/Waypoints.html";
 }
 
