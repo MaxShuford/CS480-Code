@@ -3,7 +3,6 @@
 // $ function 
 const $$ = selector => document.querySelector(selector);
 
-let numOfWaypoints = 0;
 
 const getRoutes = () => {
     const allWaypoints =  document.querySelectorAll(".cityBox");
@@ -29,7 +28,7 @@ const getRoutes = () => {
     console.log(allWaypoints.length)
     if(allWaypoints.length > 0){
         
-        let waypointOBJ;
+        let waypointOBJ =[];
         for(let i = 0; i < allWaypoints.length; i++){
 
             //get current waypoint value
@@ -54,33 +53,36 @@ const getRoutes = () => {
             })
             .then(response => response.json())
             .then(data => {
-            console.log('Success:', data);
-            locationData = JSON.parse(data);
-                waypointOBJ[i] = {"waypoint_num":i, "name": wpCity, "lat": locationData.lat, "long": locationData.long}
+                console.log('Success:', data)
+                waypointOBJ[i] = data;
+                waypointOBJ[i].id = i;
+                console.log(waypointOBJ[i]);
+                console.log("i: ", i, "num:", allWaypoints.length);
+                if(i == allWaypoints.length-1)
+                {
+                    //get the directions for the routes
+                    const postData = waypointOBJ;
+                    console.log("post data:", postData);
+                    fetch('/directions', {
+                    method: 'POST', // Specify the method
+                    headers: {
+                        'Content-Type': 'application/json', // Inform the server the body is JSON
+                    },
+                    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                    console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                    console.error('Error:', error);
+                    });
+                }
             })
             .catch((error) => {
             console.error('Error:', error);
             });
         }
-
-        //get the directions for the routes
-        const postData = {"waypoints": waypointOBJ};
-            fetch('/directions', {
-            method: 'POST', // Specify the method
-            headers: {
-                'Content-Type': 'application/json', // Inform the server the body is JSON
-            },
-            body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
-            })
-            .then(response => response.json())
-            .then(data => {
-            console.log('Success:', data);
-            routes = JSON.parse(data);
-            localStorage.setItem(routes);
-            })
-            .catch((error) => {
-            console.error('Error:', error);
-            });
     }
 }
 
