@@ -3,7 +3,7 @@
 const $ = selector => document.querySelector(selector);
 let routes;
 document.addEventListener("DOMContentLoaded", () => {
-    $("logout").addEventListener("click", logout());
+    $("#logout").addEventListener("click", logout);
     $("#start").textContent = localStorage.getItem("start");
     $("#destination").textContent = localStorage.getItem("destination");
     routes = JSON.parse(localStorage.getItem("routes"));

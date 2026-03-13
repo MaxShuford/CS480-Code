@@ -128,14 +128,13 @@ function login(username, password) {
     .then(response => response.json())
     .then(data => {
     console.log('Success:', data);
-    userID = JSON.parse(data).userID;
+    userID = userID;
+    localStorage.setItem('username', username);
+    localStorage.setItem('userID', userID);
     })
     .catch((error) => {
     console.error('Error:', error);
     });
-
-    localStorage.setItem('username', username);
-    localStorage.setItem('userID', userID);
 }
 
 /*
@@ -199,8 +198,6 @@ function createAccount(username, password)
     .catch((error) => {
     console.error('Error:', error);
     });
-
-    localStorage.setItem('username', username);
 }
 
 /*

@@ -179,6 +179,6 @@ document.addEventListener("DOMContentLoaded", () =>{
     showUserLocation();
     $$("#GetRoute").addEventListener("click", getRoutes);
     $$("#wayAdd").addEventListener("click", createWaypoint);
-    $$("logout").addEventListener("click", logout());
+    $$("#logout").addEventListener("click", logout);
     $$("[name=startCity]").focus();  
 });

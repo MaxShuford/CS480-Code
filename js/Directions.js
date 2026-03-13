@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $("button").addEventListener("click", event => {
         favorite();
     });
-    $("logout").addEventListener("click", logout());
+    $("#logout").addEventListener("click", logout());
     routes = JSON.parse(localStorage.getItem("routes"));
     showImage();
     showDirections();
