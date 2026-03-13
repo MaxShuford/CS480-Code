@@ -74,141 +74,6 @@ fn extract_file_name(request_line: &str) -> Option<(String, String)> {
     Some((match_key, rest.to_string()))
 }
 
-// === API Handlers ===
-/*
-fn handle_login(request_body: &str) -> String {
-    println!("POST /login");
-
-    let login: LoginRequest = match serde_json::from_str(request_body) {
-        Ok(data) => data,
-        Err(e) => {
-            return format!("Error parsing request: {}", e);
-        }
-    };
-
-    let response = match DB::login(login) {
-        Ok(uuid) => format!("uuid: {}", uuid),
-        Err(e) => format!("Err processing request: {}", e),
-    };
-
-    response
-}
-
-fn handle_create_account(request_body: &str) -> String {
-    println!("POST /createAccount");
-
-    let create: User = match serde_json::from_str(request_body) {
-        Ok(data) => data,
-        Err(e) => {
-            return format!("Error parsing request: {}", e);
-        }
-    };
-
-    let response = match DB::create_acct(create) {
-        Ok(code) => format!("Success: {}", code),
-        Err(e) => format!("Err processing request: {}", e),
-    };
-
-    response
-}
-
-fn handle_change_password(request_body: &str) -> String {
-    println!("POST /changePassword");
-
-    let hcp: ChangePassword = match serde_json::from_str(request_body) {
-        Ok(data) => data,
-        Err(e) => {
-            return format!("Error parsing request: {}", e);
-        }
-    };
-
-    let response = match DB::change_password(hcp) {
-        Ok(code) => formats!("Success: {}", code),
-        Err(e) => format!("Err processing request: {}", e),
-    };
-
-    response
-    // TODO: parse {uuid, oldPassword, newPassword, confirmPassword}, return {error_code}
-}
-
-fn handle_add_favorite(request_body: &str) -> String {
-    println!("POST /addFavorite");
-
-    let addfave: AddFavorite = match serde_json::from_str(request_body) {
-        Ok(data) => data,
-        Err(e) => {
-            return format!("Error parsing request: {}", e);
-        }
-    };
-
-    let response = match DB::add_favorite(addfave) {
-        Ok(code) => formats!("Success: {}", code),
-        Err(e) => format!("Err processing request: {}", e),
-    };
-
-    response
-    // TODO: parse {uuid, route}, return {error_code}
-}
-
-fn handle_delete_favorite(request_body: &str) -> String {
-    println!("POST /deleteFavorite");
-
-    let delfave: DeleteFavorite = match serde_json::from_str(request_body) {
-        Ok(data) => data,
-        Err(e) => {
-            return format!("Error parsing request: {}", e);
-        }
-    };
-
-    let response = match DB::delete_favorite(delfave) {
-        Ok(code) => formats!("Success: {}", code),
-        Err(e) => format!("Err processing request: {}", e),
-    };
-
-    response
-    // TODO: parse {uuid, route_id}, return {error_code}
-}
-
-fn handle_retrieve_favorites(request_body: &str) -> String {
-    println!("POST /retrieveFavorites");
-
-    let retfave: RetrieveFavorites = match serde_json::from_str(request_body) {
-        Ok(data) => data,
-        Err(e) => {
-            return format!("Error parsing request: {}", e);
-        }
-    };
-
-    match DB::retrieve_favorite(retfave) {
-        Ok(favorites) => {
-            let route_ids: Vec<i32> = favorites.iter().map(|f| f.route_id).collect();
-            let names: Vec<String> = favorites.iter().map(|f| f.name.clone()).collect();
-
-            format!("{{\"route_id\": {:?}, \"names\": {:?}}}", route_ids, names)
-        }
-        Err(e) => format!("Err processing request: {}", e),
-    }
-    // TODO: parse {uuid}, return {route_id: [], names: []}
-}
-
-fn handle_retrieve_favorite(request_body: &str) -> String {
-    println!("POST /retrieveFavorite");
-
-    let retfave: RetrieveFavorites = match serde_json::from_str(request_body) {
-        Ok(data) => data,
-        Err(e) => {
-            return format!("Error parsing request: {}", e);
-        }
-    };
-
-    let response = match DB::retrieve_favorite(retfave) {
-        Ok(route) => format!("Success: {:?}", route), // return route
-        Err(e) => format!("Err processing request: {}", e),
-    };
-    // TODO: parse {uuid, route_id}, return {route: Route}
-}
-*/
-
 fn handle_404() {
     println!("404 Not Found");
 }
@@ -325,6 +190,65 @@ fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
         println!("=== No Body ===");
     }
 
+    let request_line = request_line.trim_end().to_string();
+    // hard code image response cuz we need it done :)
+    if &request_line[..] == "GET /css/images/SearchIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/SearchIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        stream.flush().unwrap();
+        return;
+    } else if &request_line[..] == "GET /css/Images/UserIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/UserIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        stream.flush().unwrap();
+        return;
+    } else if &request_line[..] == "GET /css/Images/ArrowIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/ArrowIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        stream.flush().unwrap();
+        return;
+    } else if &request_line[..] == "GET /css/Images/BackIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/BackIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        stream.flush().unwrap();
+        return;
+    } else if &request_line[..] == "GET /css/Images/TrashIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/TrashIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        stream.flush().unwrap();
+        return;
+    }
+
     let (status_line, content_type, response_body) =
         handle_request(request_line.as_str(), body_content.as_str(), api_keys);
 
@@ -338,6 +262,7 @@ Content-Length: {length}\r\n\r\n\
     println!("{response}");
 
     stream.write_all(response.as_bytes()).unwrap();
+    stream.flush().unwrap();
     println!("response sent");
 }
 
