@@ -33,7 +33,7 @@ function showAlternateRoutes()
         newButton.textContent = "View Directions";
         newButton.classList.add("buttons");
         newButton.addEventListener("click", event => {
-            localStorage.setItem("routes", routes[i]);
+            localStorage.setItem("routes", JSON.stringify(routes[i]));
         });
         link.appendChild(newButton);
 

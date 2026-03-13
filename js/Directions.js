@@ -1,7 +1,7 @@
 "USE STRICT";
 
 const $ = selector => document.querySelector(selector);
-let routes;
+let routes = [];
 document.addEventListener("DOMContentLoaded", () => {
     $("button").addEventListener("click", event => {
         favorite();
@@ -42,10 +42,9 @@ function showImage()
 
 function showDirections()
 {
-    const directions = localStorage.getItem("routes");
-    for (let i = 0; i < directions.length; i++){
+    for (let i = 0; i < routes.directions.length; i++){
         const newLi = document.createElement("li");
-        newLi.textContent = directions[i];
+        newLi.textContent = routes.directions[i];
         $("aside ul").appendChild(newLi);
     }
 }

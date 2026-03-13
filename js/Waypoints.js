@@ -4,6 +4,7 @@
 const $$ = selector => document.querySelector(selector);
 
 
+
 const getRoutes = () => {
     const allWaypoints =  document.querySelectorAll(".cityBox");
     console.log("Calulating Routes");
