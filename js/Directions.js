@@ -16,11 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
 function showImage()
 {
     console.log(routes);
-    const postData = [];
-    for(let i = 0; i < routes.length;i++)
-    {
-        postData[i]= {route:{route_id:i, wp:routes[i].waypoints}, geometry:routes[i].geometry};
-    }
+    
+    let postData = [{route:{route_id:0, wp:routes.waypoints}, geometry:routes.geometry}];
     console.log("post", postData);
     console.log(JSON.stringify(postData))
     fetch('/mapWithRoutes', {
