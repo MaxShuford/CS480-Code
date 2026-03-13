@@ -92,3 +92,9 @@ pub struct Base64Image {
     pub image_type: String,
     pub image: String,
 }
+
+#[derive(Debug, Clone, Deserialize)]
+pub struct UserLocation {
+    pub latitude: f64,
+    pub longitude: f64,
+}

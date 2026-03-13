@@ -467,7 +467,7 @@ fn handle_request(
             response
         }
         // requesting a map with routes on it
-        "POST /mapWithRoutes" => {
+        "POST /mapWithRoutes HTTP/1.1" => {
             println!("generating map");
             let routes: Vec<structs::RouteToMap> =
                 serde_json::from_str(body_content).expect("Invalid routes with polyline json");
@@ -488,9 +488,34 @@ fn handle_request(
                         String::from("Unable to map"),
                     ),
                 };
-            ("", "", String::new())
+            response
         }
-        // TODO: static map with user location handle
+        // requesting a map centered around the users location
+        "POST /mapWithUserLoc HTTP/1.1" => {
+            println!("generating map");
+            let loc: structs::UserLocation =
+                serde_json::from_str(body_content).expect("Invalid routes with polyline json");
+            let loc = (loc.latitude as f32, loc.longitude as f32);
+            let response =
+                match api_service::static_images_with_user_loc(loc, api_keys.mapbox.as_str()) {
+                    Ok(image_str) => (
+                        "HTTP/1.1 200 Ok",
+                        "application/json",
+                        serde_json::to_string(&structs::Base64Image {
+                            image_type: "png".to_string(),
+                            image: image_str,
+                        })
+                        .expect("Invalid  struct base64Image"),
+                    ),
+                    Err(_) => (
+                        "HTTP/1.1 400 Bad Request",
+                        "text/plain",
+                        String::from("Unable to map user location"),
+                    ),
+                };
+            response
+        }
+
         // TODO: login handle
         // TODO: create account handle
         // TODO: change password handle
