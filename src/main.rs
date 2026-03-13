@@ -2,6 +2,7 @@ mod api_service;
 mod error;
 mod routes;
 pub mod structs;
+mod user_model;
 
 use error::Error::*;
 use mysql::*;
@@ -280,12 +281,10 @@ fn handle_request(
     };
     println!("Request Code: {request_code}, File_name: {file_name}");
 
-    let url = "mysql://user:password@localhost:3306/testdb";
+    let url = "mysql://root:root@localhost:3306/testdb";
     // TODO: Test dbc connecter with db
-    /*
-        let pool = Pool::new(url).expect("Failed to create database pool");
-        let mut conn = pool.get_conn().expect("Failed to get database connection");
-    */
+    let pool = Pool::new(url).expect("Failed to create database pool");
+    let mut conn = pool.get_conn().expect("Failed to get database connection");
 
     let (status_code, content_type, body) = match &request_code[..] {
         // Initial page request
@@ -452,35 +451,33 @@ fn handle_request(
         }
 
         // TODO: handle login with db
+        // login handle
+        "POST /login HTTP/1.1" => {
+            let credentials: structs::User =
+                serde_json::from_str(body_content).expect("Invalid login credentials json");
+            let response = match user_model::login(&mut conn, credentials) {
+                Ok(uuid) => (
+                    "HTTP/1.1 200 Ok",
+                    "application/json",
+                    String::from(format!("{{\"uuid\":{}}}", uuid)),
+                ),
+                Err(LoginFailed {
+                    username: err_string,
+                }) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    String::from(format!("{err_string} failed to login")),
+                ),
+                Err(_) => (
+                    "HTTP/1.1 500 Internal Server Error",
+                    "text/plain",
+                    String::from("An error occurred during login"),
+                ),
+            };
+            response
+        }
+        // TODO: test create account with db
         /*
-                    // login handle
-                    "POST /login HTTP/1.1" => {
-                        let credentials: structs::User =
-                            serde_json::from_str(body_content).expect("Invalid login credentials json");
-                        let response = match user_model::login(&mut conn, credentials) {
-                            Ok(uuid) => (
-                                "HTTP/1.1 200 Ok",
-                                "application/json",
-                                String::from(format!("{{\"uuid\":{}}}", uuid)),
-                            ),
-                            Err(LoginFailed {
-                                username: err_string,
-                            }) => (
-                                "HTTP/1.1 400 Bad Request",
-                                "text/plain",
-                                String::from(format!("{err_string} failed to login")),
-                            ),
-                            Err(_) => (
-                                "HTTP/1.1 500 Internal Server Error",
-                                "text/plain",
-                                String::from("An error occurred during login"),
-                            ),
-                        };
-                        response
-                    }
-            */
-            // TODO: test create account with db
-            /*
             // create account handle
             "POST /createAccount HTTP/1.1" => {
                 let credentials: structs::User = serde_json::from_str(body_content)
