@@ -274,8 +274,10 @@ Content-Length: {length}\r\n\r\n\
     };
     println!("{response}");
 
-    stream.write_all(response.as_bytes()).unwrap();
-    println!("response sent");
+    match stream.write_all(response.as_bytes()) {
+        Ok(()) => println!("response sent"),
+        Err(e) => println!("failed to send response: reason {e}"),
+    }
 }
 
 fn handle_request(
