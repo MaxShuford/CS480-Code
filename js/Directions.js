@@ -1,11 +1,12 @@
 "USE STRICT";
 
 const $ = selector => document.querySelector(selector);
-
+let routes;
 document.addEventListener("DOMContentLoaded", () => {
     $("button").addEventListener("click", event => {
         favorite();
     });
+    routes = JSON.parse(localStorage.getItem("routes"));
     showImage();
     showDirections();
 
@@ -14,8 +15,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function showImage()
 {
-    const postData = {routes: localStorage.getItem("routes")};
-
+    console.log(routes);
+    const postData = [];
+    for(let i = 0; i < routes.length;i++)
+    {
+        postData[i]= {route:{route_id:i, wp:routes[i].waypoints}, geometry:routes[i].geometry};
+    }
+    console.log("post", postData);
+    console.log(JSON.stringify(postData))
     fetch('/mapWithRoutes', {
     method: 'POST', // Specify the method
     headers: {
@@ -26,8 +33,7 @@ function showImage()
     .then(response => response.json())
     .then(data => {
     console.log('Success:', data);
-    const image = JSON.parse(data).image
-    $("img").src = "data:image/png;base64," + image;
+    $("#theMap").src = "data:image/png;base64," + data.image;
     })
     .catch((error) => {
     console.error('Error:', error);

@@ -1,37 +1,41 @@
 "USE STRICT";
 
 const $ = selector => document.querySelector(selector);
-
+let routes;
 document.addEventListener("DOMContentLoaded", () => {
     $("#start").textContent = localStorage.getItem("start");
     $("#destination").textContent = localStorage.getItem("destination");
-    //showAlternateRoutes();
+    routes = JSON.parse(localStorage.getItem("routes"));
+    showAlternateRoutes();
     showImage();
-
     $(".backButton").addEventListener("click", backToWP);
 });
 
 function showAlternateRoutes()
 {
-    const routes = localStorage.getItem("routes")
     for (let i = 0; i < routes.length; i++){
 
         //Create New List Item
         const newLi = document.createElement("li");
-        newLi.textContent = routes[i];
+        //newLi.textContent = routes[i];
 
         //Create Text of Route X then add as child of li
         const newText = document.createElement("Span");
         newText.textContent = "Route " + i;
         newLi.appendChild(newText);
 
+        const link = document.createElement("a");
+        link.href = "/html/Directions.html";
+        newLi.appendChild(link);
+
         //Create new button, give event then add as child of li
         const newButton = document.createElement("button");
         newButton.textContent = "View Directions";
+        newButton.classList.add("buttons");
         newButton.addEventListener("click", event => {
             localStorage.setItem("routes", routes[i]);
         });
-        newLi.appendChild(newButton);
+        link.appendChild(newButton);
 
         //add Li as child of ul
         $("aside ul").appendChild(newLi);
@@ -40,10 +44,14 @@ function showAlternateRoutes()
 
 function showImage()
 {
-    routes = JSON.parse(localStorage.getItem("routes"));
     console.log(routes);
-    const postData = [{route:{route_id:0, wp:routes[0].waypoints}}, {geometry:routes[0].geometry}];
-    console.log(postData);
+    const postData = [];
+    for(let i = 0; i < routes.length;i++)
+    {
+        postData[i]= {route:{route_id:i, wp:routes[i].waypoints}, geometry:routes[i].geometry};
+    }
+    console.log("post", postData);
+    console.log(JSON.stringify(postData))
     fetch('/mapWithRoutes', {
     method: 'POST', // Specify the method
     headers: {
@@ -54,7 +62,7 @@ function showImage()
     .then(response => response.json())
     .then(data => {
     console.log('Success:', data);
-    $("#theMap").src = "data:image/png;base64," + image;
+    $("#theMap").src = "data:image/png;base64," + data.image;
     })
     .catch((error) => {
     console.error('Error:', error);
