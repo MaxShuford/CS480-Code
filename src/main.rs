@@ -199,8 +199,8 @@ fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     } else if &request_line[..] == "GET /css/Images/UserIcon.png HTTP/1.1" {
@@ -210,8 +210,8 @@ Content-Length: {length}\r\n\r\n"};
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     } else if &request_line[..] == "GET /css/Images/ArrowIcon.png HTTP/1.1" {
@@ -221,8 +221,8 @@ Content-Length: {length}\r\n\r\n"};
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     } else if &request_line[..] == "GET /css/Images/BackIcon.png HTTP/1.1" {
@@ -232,8 +232,8 @@ Content-Length: {length}\r\n\r\n"};
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     } else if &request_line[..] == "GET /css/Images/TrashIcon.png HTTP/1.1" {
@@ -243,8 +243,8 @@ Content-Length: {length}\r\n\r\n"};
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     }
@@ -441,7 +441,8 @@ fn handle_request(
             response
         }
 
-        // TODO: login handle
+        // TODO: implement login handle
+
         // TODO: create account handle
         // TODO: change password handle
         // TODO: add favorite handle
