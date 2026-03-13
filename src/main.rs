@@ -638,6 +638,7 @@ fn handle_request(
             "Not Found.".to_string(),
         ),
     };
+    println!("{status_code}, {content_type}, {body}");
 
     (String::from(status_code), String::from(content_type), body)
 }
