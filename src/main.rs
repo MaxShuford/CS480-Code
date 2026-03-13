@@ -197,6 +197,7 @@ fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
 
     let (status_line, content_type, response_body) =
         handle_request(request_line.as_str(), body_content.as_str(), api_keys);
+    println!("recieved response to pass");
 
     // read the body
     let mut body_content = String::new();
