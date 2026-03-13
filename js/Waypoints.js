@@ -60,6 +60,8 @@ const getRoutes = () => {
                 console.log("i: ", i, "num:", allWaypoints.length);
                 if(i == allWaypoints.length-1)
                 {
+                    localStorage.setItem("start", waypointOBJ[0].name);
+                    localStorage.setItem("destination", waypointOBJ[allWaypoints.length-1].name)
                     //get the directions for the routes
                     const postData = waypointOBJ;
                     console.log("post data:", postData);
@@ -73,6 +75,9 @@ const getRoutes = () => {
                     .then(response => response.json())
                     .then(data => {
                     console.log('Success:', data);
+                    localStorage.setItem("routes", JSON.stringify(data.routes));
+                    console.log("saved route", data.routes);
+                    window.location.href ="/html/Route.html";
                     })
                     .catch((error) => {
                     console.error('Error:', error);

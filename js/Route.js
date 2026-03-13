@@ -3,9 +3,9 @@
 const $ = selector => document.querySelector(selector);
 
 document.addEventListener("DOMContentLoaded", () => {
-    $("#start").value = localStorage.getItem("start");
-    $("#destination").value = localStorage.getItem("destination");
-    showAlternateRoutes();
+    $("#start").textContent = localStorage.getItem("start");
+    $("#destination").textContent = localStorage.getItem("destination");
+    //showAlternateRoutes();
     showImage();
 
     $(".backButton").addEventListener("click", backToWP);
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function showAlternateRoutes()
 {
-    //const routes = localStorage.getItem("routes")
+    const routes = localStorage.getItem("routes")
     for (let i = 0; i < routes.length; i++){
 
         //Create New List Item
@@ -40,7 +40,10 @@ function showAlternateRoutes()
 
 function showImage()
 {
-    const postData = {routes: localStorage.getItem("routes")};
+    routes = JSON.parse(localStorage.getItem("routes"));
+    console.log(routes);
+    const postData = [{route:{route_id:0, wp:routes[0].waypoints}}, {geometry:routes[0].geometry}];
+    console.log(postData);
     fetch('/mapWithRoutes', {
     method: 'POST', // Specify the method
     headers: {
@@ -51,8 +54,7 @@ function showImage()
     .then(response => response.json())
     .then(data => {
     console.log('Success:', data);
-    const image = JSON.parse(data).image
-    $("img").src = "data:image/png;base64," + image;
+    $("#theMap").src = "data:image/png;base64," + image;
     })
     .catch((error) => {
     console.error('Error:', error);
