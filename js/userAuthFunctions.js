@@ -9,11 +9,13 @@ function validateUsername(username)
 {
     if(username.value === ""){
         username.nextElementSibling.textContent = "Username is required.";
+        username.nextElementSibling.classList.remove("hidden");
         return false;
     }
     else if(username.value.length < 3 || username.value.length > 30)
     {
         username.nextElementSibling.textContent = "Username must be between 3 and 30 characters.";
+        username.nextElementSibling.classList.remove("hidden");
         return false;
     }
     else
@@ -34,11 +36,13 @@ function validatePassword(password, code)
     let passrequirmentsmet = 0;
     if(password.value === ""){
         password.nextElementSibling.textContent = "Password is required.";
+        password.nextElementSibling.classList.remove("hidden");
         return false;
     } 
     else if(password.value.length < 8 || password.value.length > 25)
     {
         password.nextElementSibling.textContent = "Password must be between 8 and 25 characters.";
+        password.nextElementSibling.classList.remove("hidden");
         return false;
     }
     else{
@@ -57,10 +61,14 @@ function validatePassword(password, code)
 
         if(passrequirmentsmet < 3)
         {
-            if(code == 0)
+            if(code == 0){
                 password.nextElementSibling.textContent = "Password must contain at least 3 of the following: uppercase letters, lowercase letters, numbers, and special characters.";
-            else
+                password.nextElementSibling.classList.remove("hidden");
+            }
+            else{
                 password.nextElementSibling.textContent = "Invalid Password";
+                password.nextElementSibling.classList.remove("hidden")
+             }
             return false;
         }
         else

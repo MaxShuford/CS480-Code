@@ -26,9 +26,18 @@ h3 span{
     color:red;
 }
 
+
+.hidden{
+    margin: 0 10px;
+}
+
 .buttons{
     border-radius: 15px;
     width:100%;
+}
+
+form .buttons{
+    margin-top:2px;
 }
 
 .backButton{

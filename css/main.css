@@ -1,5 +1,16 @@
+/*
+:root{
+    --orange: #bd7a0b;
+    --cyan: #15bcca;
+    --purple: #cb57ac;
+    --blue:#0443fa;
+
+    --background-color: gray;
+}
+*/
 html{
     width: 1536px;
+    background: var(--background-color);
 }
 
 section{
