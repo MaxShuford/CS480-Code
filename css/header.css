@@ -105,6 +105,13 @@ li a{
     cursor: pointer;
     margin-top: 35px;
     width: 15%;
+
+    
+}
+
+.backButton a{
+    text-decoration: none;
+    display: inherit
 }
 
 .backButton h2{
