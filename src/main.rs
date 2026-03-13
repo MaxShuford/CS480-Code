@@ -281,7 +281,7 @@ fn handle_request(
     };
     println!("Request Code: {request_code}, File_name: {file_name}");
 
-    let url = "mysql://root:root@localhost:3306/testdb";
+    let url = "mysql://root:root@localhost:3306/mooglegaps";
     // TODO: Test dbc connecter with db
     let pool = Pool::new(url).expect("Failed to create database pool");
     let mut conn = pool.get_conn().expect("Failed to get database connection");
