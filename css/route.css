@@ -1,4 +1,8 @@
-
+:root{
+    --first-route:#00f;
+    --second-route:#800;
+    --third-route: #f00;
+}
 
 aside ul{
     line-height: 75px;
@@ -17,6 +21,7 @@ aside div{
   line-height: 50px;
   background-color: var(--purple);
   border: 3px solid var(--purple-border);
+  color:var(--text-color)
 }
 
 #start{
@@ -38,6 +43,16 @@ aside li{
   color: white;
   padding-left: 5%;
   margin: 25% 0;
+}
+
+#route_1{
+    background-color: var(--first-route);
+}
+#route_2{
+    background-color: var(--second-route);
+}
+#route_3{
+    background-color: var(--third-route);
 }
 
 aside li span{

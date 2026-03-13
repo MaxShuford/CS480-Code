@@ -17,6 +17,7 @@ function showAlternateRoutes()
 
         //Create New List Item
         const newLi = document.createElement("li");
+        newLi.id = "route_" + (i+1);
         //newLi.textContent = routes[i];
 
         //Create Text of Route X then add as child of li
