@@ -5,12 +5,8 @@ mod routes;
 pub mod structs;
 mod user_model;
 
-use error::AppResult;
 use error::Error::*;
-use favorite_model::*;
 use mysql::*;
-use structs::*;
-use user_model::*;
 
 use std::{
     fs,
@@ -202,6 +198,72 @@ fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
     let (status_line, content_type, response_body) =
         handle_request(request_line.as_str(), body_content.as_str(), api_keys);
 
+    // read the body
+    let mut body_content = String::new();
+    if content_length > 0 {
+        let mut body = vec![0; content_length];
+        reader.read_exact(&mut body).unwrap();
+        let body = String::from_utf8_lossy(&body);
+        body_content.push_str(body.as_ref());
+        println!("=== Body ===\n{}", body_content);
+    } else {
+        println!("=== No Body ===");
+    }
+
+    let request_line = request_line.trim_end().to_string();
+    // hard code image response cuz we need it done :)
+    if &request_line[..] == "GET /css/images/SearchIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/SearchIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        return;
+    } else if &request_line[..] == "GET /css/Images/UserIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/UserIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        return;
+    } else if &request_line[..] == "GET /css/Images/ArrowIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/ArrowIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        return;
+    } else if &request_line[..] == "GET /css/Images/BackIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/BackIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        return;
+    } else if &request_line[..] == "GET /css/Images/TrashIcon.png HTTP/1.1" {
+        let contents = fs::read("css/Images/TrashIcon.png").unwrap();
+        let content_type = "image/png";
+        let length = contents.len();
+        let response = format! {"HTTP/1.1 200 OK
+Content-Type: {content_type}
+Content-Length: {length}\r\n\r\n"};
+        stream.write(response.as_bytes()).unwrap();
+        stream.write(&contents).unwrap();
+        return;
+    }
+
     let length = response_body.len();
     let response = format! {
         "{status_line}
@@ -228,8 +290,11 @@ fn handle_request(
 
     //create database connection
     let url = "mysql://user:password@localhost:3306/testdb";
-    let pool = Pool::new(url).expect("Failed to create database pool");
-    let mut conn = pool.get_conn().expect("Failed to get database connection");
+    // TODO: Test dbc connecter with db
+    /*
+        let pool = Pool::new(url).expect("Failed to create database pool");
+        let mut conn = pool.get_conn().expect("Failed to get database connection");
+    */
 
     let (status_code, content_type, body) = match &request_code[..] {
         // Initial page request
@@ -395,6 +460,8 @@ fn handle_request(
             response
         }
 
+        // TODO: test the following matches with db
+        /*
         // login handle
         "POST /login HTTP/1.1" => {
             let credentials: structs::User =
@@ -562,7 +629,7 @@ fn handle_request(
             };
             response
         }
-
+        */
         _ => (
             "HTTP/1.1 404 Not Found",
             "text/plain",
