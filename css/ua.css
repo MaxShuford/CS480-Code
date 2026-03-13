@@ -1,3 +1,20 @@
+:root{
+    --cyan: #1299a4;
+    --cyan-border: #7be2ea;
+    --purple-border: #d97abf;
+    --purple: #942877;
+
+    --background-color: #141929;
+    --text-color: rgb(236, 236, 236);
+
+    --green: green;
+    --green-border: rgb(2, 189, 2);
+}
+
+html{
+    background-color: var(--background-color);
+}
+
 .userForm{
     width: 300px;
     margin: auto;
@@ -15,15 +32,18 @@ input{
 h1, h2{
     text-align: center;
     width: 100%;
+    color: var(--text-color);
 }
 
 h3{
     margin: 0;
+    color: var(--text-color);
 }
 
 h3 span{
     font-size: 10px;
     color:red;
+    font-weight: normal;
 }
 
 
@@ -34,31 +54,51 @@ h3 span{
 .buttons{
     border-radius: 15px;
     width:100%;
+    background-color: var(--cyan);
+    border: 3px solid var(--cyan-border);
+    color: var(--text-color);
+    font-weight: bold;
+}
+
+.buttons:hover{
+    background-color: var(--cyan-border);
+    border: 3px solid var(--cyan);
+
 }
 
 form .buttons{
     margin-top:2px;
 }
 
+/* Back Button*/
 .backButton{
     text-align: left;
     float: left;
     display: flex;
     cursor: pointer;
     margin-top: 35px;
+    width: 15%;
+
+    
+}
+
+.backButton a{
+    text-decoration: none;
+    display: inherit
 }
 
 .backButton h2{
     margin: 0;
-    color: black;
+    color: var(--purple);
 }
 
 .backButton:hover h2{
-    color:rgb(10, 106, 93);
+    color:var(--purple-border);
 }
 
 
 #backIcon{
     height: 30px;
     width: 30px;
+    filter: brightness(0%) invert(100%) sepia(100%) saturate(100000%) hue-rotate(200deg) brightness(40%) saturate(350%); ;
 }

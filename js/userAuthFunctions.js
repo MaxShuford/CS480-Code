@@ -21,6 +21,7 @@ function validateUsername(username)
     else
     {
         username.nextElementSibling.textContent = "";
+        username.nextElementSibling.classList.add("hidden");
         return true;
     }
 }
@@ -74,6 +75,7 @@ function validatePassword(password, code)
         else
         {
             password.nextElementSibling.textContent = "";
+            password.nextElementSibling.classList.add("hidden");
             return true;
         }
     }
@@ -100,6 +102,7 @@ function passwordsMatch(password, confirmPassword)
     else
     {
         confirmPassword.nextElementSibling.textContent = "";
+        confirmPassword.nextElementSibling.classList.add("hidden");
         return true;
     }
 }
