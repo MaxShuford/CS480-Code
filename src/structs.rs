@@ -13,7 +13,7 @@ pub struct ChangePassword {
     pub new_pw: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Route {
     pub route_id: i32,
     pub wp: Vec<Waypoint>,
@@ -27,30 +27,30 @@ pub struct Waypoint {
     pub longitude: f64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct AddFavorite {
     pub uuid: i64,
     pub route: Route,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct DeleteFavorite {
     pub route_id: i32,
     pub uuid: i64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct RetrieveFavorites {
     pub uuid: i64,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Favorite {
     pub uuid: i64,
     pub route_id: i32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct FavoriteReturn {
     pub name: String,
     pub route_id: i32,
@@ -97,4 +97,9 @@ pub struct Base64Image {
 pub struct UserLocation {
     pub latitude: f64,
     pub longitude: f64,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct FavoritesList {
+    pub favorites: Vec<FavoriteReturn>,
 }
