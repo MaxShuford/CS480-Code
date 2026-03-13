@@ -65,12 +65,3 @@ function favorite()
     console.error('Error:', error);
     });
 }
-
-//Back to route button PROTOTYPE
-const backToRoutes = () => {
-
-    //What data should be brought back to
-
-
-    location.href = "Route.html";
-}

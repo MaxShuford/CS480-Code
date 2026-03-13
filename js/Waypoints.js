@@ -3,7 +3,7 @@
 // $ function 
 const $$ = selector => document.querySelector(selector);
 
-
+let numOfWaypoints= 2;
 
 const getRoutes = () => {
     const allWaypoints =  document.querySelectorAll(".cityBox");

@@ -21,7 +21,7 @@ function showAlternateRoutes()
 
         //Create Text of Route X then add as child of li
         const newText = document.createElement("Span");
-        newText.textContent = "Route " + i;
+        newText.textContent = "Route " + (i+1);
         newLi.appendChild(newText);
 
         const link = document.createElement("a");
@@ -69,11 +69,3 @@ function showImage()
     });
 }
 
-//Back to home button PROTOTYPE
-const backToWP = () => {
-
-    //What data should be brought back to Waypoints?
-
-
-    location.href = "Waypoints.html";
-}
