@@ -211,59 +211,61 @@ fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
         println!("=== No Body ===");
     }
 
-    let request_line = request_line.trim_end().to_string();
-    // hard code image response cuz we need it done :)
-    if &request_line[..] == "GET /css/images/SearchIcon.png HTTP/1.1" {
-        let contents = fs::read("css/Images/SearchIcon.png").unwrap();
-        let content_type = "image/png";
-        let length = contents.len();
-        let response = format! {"HTTP/1.1 200 OK
+    /*
+        let request_line = request_line.trim_end().to_string();
+        // hard code image response cuz we need it done :)
+        if &request_line[..] == "GET /css/images/SearchIcon.png HTTP/1.1" {
+            let contents = fs::read("css/Images/SearchIcon.png").unwrap();
+            let content_type = "image/png";
+            let length = contents.len();
+            let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
-        return;
-    } else if &request_line[..] == "GET /css/Images/UserIcon.png HTTP/1.1" {
-        let contents = fs::read("css/Images/UserIcon.png").unwrap();
-        let content_type = "image/png";
-        let length = contents.len();
-        let response = format! {"HTTP/1.1 200 OK
+            stream.write(response.as_bytes()).unwrap();
+            stream.write(&contents).unwrap();
+            return;
+        } else if &request_line[..] == "GET /css/Images/UserIcon.png HTTP/1.1" {
+            let contents = fs::read("css/Images/UserIcon.png").unwrap();
+            let content_type = "image/png";
+            let length = contents.len();
+            let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
-        return;
-    } else if &request_line[..] == "GET /css/Images/ArrowIcon.png HTTP/1.1" {
-        let contents = fs::read("css/Images/ArrowIcon.png").unwrap();
-        let content_type = "image/png";
-        let length = contents.len();
-        let response = format! {"HTTP/1.1 200 OK
+            stream.write(response.as_bytes()).unwrap();
+            stream.write(&contents).unwrap();
+            return;
+        } else if &request_line[..] == "GET /css/Images/ArrowIcon.png HTTP/1.1" {
+            let contents = fs::read("css/Images/ArrowIcon.png").unwrap();
+            let content_type = "image/png";
+            let length = contents.len();
+            let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
-        return;
-    } else if &request_line[..] == "GET /css/Images/BackIcon.png HTTP/1.1" {
-        let contents = fs::read("css/Images/BackIcon.png").unwrap();
-        let content_type = "image/png";
-        let length = contents.len();
-        let response = format! {"HTTP/1.1 200 OK
+            stream.write(response.as_bytes()).unwrap();
+            stream.write(&contents).unwrap();
+            return;
+        } else if &request_line[..] == "GET /css/Images/BackIcon.png HTTP/1.1" {
+            let contents = fs::read("css/Images/BackIcon.png").unwrap();
+            let content_type = "image/png";
+            let length = contents.len();
+            let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
-        return;
-    } else if &request_line[..] == "GET /css/Images/TrashIcon.png HTTP/1.1" {
-        let contents = fs::read("css/Images/TrashIcon.png").unwrap();
-        let content_type = "image/png";
-        let length = contents.len();
-        let response = format! {"HTTP/1.1 200 OK
+            stream.write(response.as_bytes()).unwrap();
+            stream.write(&contents).unwrap();
+            return;
+        } else if &request_line[..] == "GET /css/Images/TrashIcon.png HTTP/1.1" {
+            let contents = fs::read("css/Images/TrashIcon.png").unwrap();
+            let content_type = "image/png";
+            let length = contents.len();
+            let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
-        return;
-    }
+            stream.write(response.as_bytes()).unwrap();
+            stream.write(&contents).unwrap();
+            return;
+        }
+    */
 
     let length = response_body.len();
     let response = format! {
