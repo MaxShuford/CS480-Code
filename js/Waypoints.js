@@ -36,8 +36,22 @@ const getRoutes = () => {
             let wpCity = allWaypoints[i].value;
             console.log(wpCity + " Waypoint " + i);
 
-            if(!(wpCity.includes(", "))){
-                alert("Invalid Format");
+            if(wpCity.value == ""){
+                if(i == 0)
+                    alert("Textbox Empty at Start City");
+                else if(i == (allWaypoints.length-1))
+                    alert("Textbox Empty at Destination City");
+                else
+                    alert("Textbox Empty at Waypoint " + (i));
+                break;
+            }
+            else if(!(wpCity.includes(", "))){
+                if(i == 0)
+                    alert("Invalid Format at Start City: Must be \'City, ST\'");
+                else if(i == (allWaypoints.length-1))
+                    alert("Invalid Format at Destination City: Must be \'City, ST\'");
+                else
+                    alert("Invalid Format at Waypoint "+ (i+1) +": Must be \'City, ST\'");
                 break;
             }
             
