@@ -5,7 +5,7 @@ use crate::error::AppResult;
 use crate::error::Error::*;
 
 //function to add favorite route to database
-pub fn add_fav(conn: &mut PooledConn, input: AddFavorite) -> AppResult<String> {
+pub fn add_fav(conn: &mut PooledConn, input: AddFavorite) -> AppResult<i32> {
 
     //query db for number of routes
     let num_routes: Option<u32> = conn.exec_first(
@@ -50,12 +50,12 @@ pub fn add_fav(conn: &mut PooledConn, input: AddFavorite) -> AppResult<String> {
         }
 
         //return success
-        Ok(String::from("success"))
+        Ok(1)
     }
 }
 
 //function to delete favorite from database
-pub fn delete_fav(conn: &mut PooledConn, input: DeleteFavorite) -> AppResult<String> {
+pub fn delete_fav(conn: &mut PooledConn, input: DeleteFavorite) -> AppResult<i32> {
 
     //delete waypoints
     conn.exec_drop(
@@ -79,7 +79,7 @@ pub fn delete_fav(conn: &mut PooledConn, input: DeleteFavorite) -> AppResult<Str
     
     //check that the route was deleted
     if conn.affected_rows() > 0 {
-        Ok(String::from("success"))
+        Ok(1)
     } else {
         Err(DeleteUnsuccessful)
     }
