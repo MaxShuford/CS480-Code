@@ -221,3 +221,12 @@ async function hashString(message) {
     console.log(hashHex);
     return hashHex;
 }
+
+/*
+    logs the user out of the signed in account
+*/
+function logout()
+{
+    localStorage.setItem("username", "");
+    localStorage.setItem("userID", "");
+}
