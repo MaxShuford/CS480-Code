@@ -3,10 +3,10 @@
 const $ = selector => document.querySelector(selector);
 let routes = [];
 document.addEventListener("DOMContentLoaded", () => {
-    $("button").addEventListener("click", event => {
+    $("#favoriteButton").addEventListener("click", event => {
         favorite();
     });
-    $("#logout").addEventListener("click", logout());
+    $("#logout").addEventListener("click", logout);
     routes = JSON.parse(localStorage.getItem("routes"));
     showImage();
     showDirections();
@@ -54,20 +54,34 @@ function showDirections()
 
 function favorite()
 {
-    const postData = { uid: localStorage.getItem('userID'), route: localStorage.getItem('route') };
+    console.log("favorite button clicked");
+    const uuid = parseInt(localStorage.getItem("userID"));
+
+    const storedRoutes = JSON.parse(localStorage.getItem("routes"));
+    const route = storedRoutes.waypoints;
+
+    if (!uuid || !route) {
+        console.error("Missing userID or route");
+        return;
+    }
+
+    const postData = {
+        uuid: uuid,
+        wp: route
+    };
 
     fetch('/addToFavorite', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
     })
     .then(response => response.json())
     .then(data => {
-    console.log('Success:', data);
+        console.log("Favorite saved:", data);
     })
-    .catch((error) => {
-    console.error('Error:', error);
+    .catch(error => {
+        console.error("Error:", error);
     });
 }

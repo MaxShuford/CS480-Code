@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if(validUsername && validPassword && validConfirmPassword)
         {
             createAccount(username.value, password.value);
-            login(username.value, password.value);
         }
     });
 

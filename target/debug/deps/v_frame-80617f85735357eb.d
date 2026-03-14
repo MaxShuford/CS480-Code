@@ -1,0 +1,11 @@
+C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\deps\v_frame-80617f85735357eb.d: C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\lib.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\frame.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\math.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\pixel.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\plane.rs
+
+C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\deps\libv_frame-80617f85735357eb.rlib: C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\lib.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\frame.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\math.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\pixel.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\plane.rs
+
+C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\deps\libv_frame-80617f85735357eb.rmeta: C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\lib.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\frame.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\math.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\pixel.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\plane.rs
+
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\lib.rs:
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\frame.rs:
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\math.rs:
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\pixel.rs:
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\v_frame-0.3.9\src\plane.rs:

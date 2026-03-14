@@ -5,91 +5,69 @@ const $$ = selector => document.querySelector(selector);
 
 let numOfWaypoints= 0;
 
-const getRoutes = () => {
-    const allWaypoints =  document.querySelectorAll(".cityBox");
-    console.log("Calulating Routes");
+const getRoutes = async () => {
 
-    const startBox = $$("[name=startCity]");
-    const destinationBox = $$("[name=destinationCity]");
+    const allWaypoints = document.querySelectorAll(".cityBox");
+    console.log("Calculating Routes");
 
+    let waypointOBJ = [];
 
-    const startCity = startBox.value;
-    const destinationCity = destinationBox.value;
-    
-    console.log(startCity);
-    console.log(destinationCity);
+    const requests = [];
 
+    for (let i = 0; i < allWaypoints.length; i++) {
 
-    let validStart = (startCity.includes(", "));
-    let validEnd = (destinationCity.includes(", "));
+        let wpCity = allWaypoints[i].value;
 
-    console.log(validStart);
-    console.log(validEnd);
-    //Check if the city input had valid format
-    console.log(allWaypoints.length)
-    if(allWaypoints.length > 0){
-        
-        let waypointOBJ =[];
-        for(let i = 0; i < allWaypoints.length; i++){
+        if (!wpCity.includes(", ")) {
+            alert("Invalid Format");
+            return;
+        }
 
-            //get current waypoint value
-            let wpCity = allWaypoints[i].value;
-            console.log(wpCity + " Waypoint " + i);
+        const wpSplit = wpCity.split(", ");
+        const postData = { city: wpSplit[0], state: wpSplit[1] };
 
-            if(!(wpCity.includes(", "))){
-                alert("Invalid Format");
-                break;
-            }
-            
-            //get lat and long for waypoint
-            const wpSplit = wpCity.split(", ");
-            console.log(wpSplit);
-            const postData = {city:wpSplit[0], state:wpSplit[1]};
+        requests.push(
             fetch('/locationData', {
-            method: 'POST', // Specify the method
-            headers: {
-                'Content-Type': 'application/json', // Inform the server the body is JSON
-            },
-            body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postData)
             })
             .then(response => response.json())
             .then(data => {
-                console.log('Success:', data)
+
+                data.id = i;
+                data.name = wpCity;
+
                 waypointOBJ[i] = data;
-                waypointOBJ[i].id = i;
-                console.log(waypointOBJ[i]);
-                console.log("i: ", i, "num:", allWaypoints.length);
-                if(i == allWaypoints.length-1)
-                {
-                    localStorage.setItem("start", waypointOBJ[0].name);
-                    localStorage.setItem("destination", waypointOBJ[allWaypoints.length-1].name)
-                    //get the directions for the routes
-                    const postData = waypointOBJ;
-                    console.log("post data:", postData);
-                    fetch('/directions', {
-                    method: 'POST', // Specify the method
-                    headers: {
-                        'Content-Type': 'application/json', // Inform the server the body is JSON
-                    },
-                    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                    console.log('Success:', data);
-                    localStorage.setItem("routes", JSON.stringify(data.routes));
-                    console.log("saved route", data.routes);
-                    window.location.href ="/html/Route.html";
-                    })
-                    .catch((error) => {
-                    console.error('Error:', error);
-                    });
-                }
             })
-            .catch((error) => {
-            console.error('Error:', error);
-            });
-        }
+        );
     }
+    // ASYNC RUST FOR THE WIN
+    await Promise.all(requests);
+
+    console.log("All waypoints resolved:", waypointOBJ);
+
+    localStorage.setItem("start", waypointOBJ[0].name);
+    localStorage.setItem("destination", waypointOBJ[waypointOBJ.length - 1].name);
+
+    fetch('/directions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(waypointOBJ)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Routes received:", data);
+        localStorage.setItem("routes", JSON.stringify(data.routes));
+        window.location.href = "/html/Route.html";
+    })
+    .catch(error => {
+        console.error(error);
+    });
 }
 
 

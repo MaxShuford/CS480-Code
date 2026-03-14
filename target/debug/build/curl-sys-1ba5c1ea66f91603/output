@@ -1,0 +1,200 @@
+cargo:rerun-if-changed=curl
+cargo:rustc-check-cfg=cfg(libcurl_vendored,link_libnghttp2,link_libz,link_openssl,)
+first run of vcpkg did not find libcurl: Could not find Vcpkg tree: No vcpkg installation found. Set the VCPKG_ROOT environment variable or run 'vcpkg integrate install'
+second run of vcpkg did not find libcurl: Could not find Vcpkg tree: No vcpkg installation found. Set the VCPKG_ROOT environment variable or run 'vcpkg integrate install'
+cargo:root=C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\build\curl-sys-1ba5c1ea66f91603\out
+cargo:include=C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\build\curl-sys-1ba5c1ea66f91603\out\include
+cargo:static=1
+cargo:rustc-cfg=libcurl_vendored
+cargo:rustc-cfg=link_libz
+OPT_LEVEL = Some(0)
+TARGET = Some(x86_64-pc-windows-msvc)
+CARGO_ENCODED_RUSTFLAGS = Some()
+cargo:rerun-if-env-changed=VCINSTALLDIR
+VCINSTALLDIR = None
+cargo:rerun-if-env-changed=VSTEL_MSBuildProjectFullPath
+VSTEL_MSBuildProjectFullPath = None
+cargo:rerun-if-env-changed=VCToolsVersion
+VCToolsVersion = None
+cargo:rerun-if-env-changed=VSCMD_ARG_VCVARS_SPECTRE
+VSCMD_ARG_VCVARS_SPECTRE = None
+cargo:rerun-if-env-changed=WindowsSdkDir
+WindowsSdkDir = None
+cargo:rerun-if-env-changed=WindowsSDKVersion
+WindowsSDKVersion = None
+cargo:rerun-if-env-changed=LIB
+LIB = None
+PATH = Some(C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug;C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\deps;C:\Users\MaxSh\.rustup\toolchains\stable-x86_64-pc-windows-msvc\lib\rustlib\x86_64-pc-windows-msvc\lib;C:\Users\MaxSh\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\MaxSh\bin;C:\mingw\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files\Eclipse Adoptium\jdk-17.0.8.101-hotspot\bin;C:\Program Files (x86)\Razer\ChromaBroadcast\bin;C:\Program Files\Razer\ChromaBroadcast\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;C:\Windows\System32\OpenSSH;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NGX;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Windows\system32\config\systemprofile\AppData\Local\Microsoft\WindowsApps;C:\Program Files\dotnet;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0;C:\WINDOWS\System32\OpenSSH;C:\Program Files\doxygen\bin;C:\Program Files\Neovim\bin;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs;C:\Users\MaxSh\.cargo\bin;C:\Users\MaxSh\AppData\Local\Microsoft\WindowsApps;C:\Users\MaxSh\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\MaxSh\AppData\Roaming\npm;C:\Users\MaxSh\AppData\Local\Programs\MiKTeX\miktex\bin\x64;C:\Program Files (x86)\Nmap;C:\Program Files\Git\usr\bin\vendor_perl;C:\Program Files\Git\usr\bin\core_perl;C:\Users\MaxSh\.rustup\toolchains\stable-x86_64-pc-windows-msvc\bin)
+cargo:rerun-if-env-changed=INCLUDE
+INCLUDE = None
+HOST = Some(x86_64-pc-windows-msvc)
+cargo:rerun-if-env-changed=CC_x86_64-pc-windows-msvc
+CC_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=CC_x86_64_pc_windows_msvc
+CC_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=HOST_CC
+HOST_CC = None
+cargo:rerun-if-env-changed=CC
+CC = None
+cargo:rerun-if-env-changed=CRATE_CC_NO_DEFAULTS
+CRATE_CC_NO_DEFAULTS = None
+CARGO_CFG_TARGET_FEATURE = Some(cmpxchg16b,fxsr,sse,sse2,sse3)
+DEBUG = Some(true)
+cargo:rerun-if-env-changed=CFLAGS
+CFLAGS = None
+cargo:rerun-if-env-changed=HOST_CFLAGS
+HOST_CFLAGS = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64_pc_windows_msvc
+CFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=CFLAGS_x86_64-pc-windows-msvc
+CFLAGS_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=CC_ENABLE_DEBUG_OUTPUT
+altsvc.c
+asyn-base.c
+asyn-thrdd.c
+bufq.c
+bufref.c
+cf-h1-proxy.c
+cf-haproxy.c
+cf-https-connect.c
+cf-ip-happy.c
+cf-socket.c
+cfilters.c
+conncache.c
+connect.c
+content_encoding.c
+cookie.c
+cshutdn.c
+curl_addrinfo.c
+curl_fopen.c
+curl_get_line.c
+curl_memrchr.c
+curl_range.c
+curl_sha512_256.c
+curl_share.c
+curl_threads.c
+curl_trc.c
+base64.c
+dynbuf.c
+fopen.c
+inet_ntop.c
+inet_pton.c
+nonblock.c
+strcopy.c
+strerr.c
+strparse.c
+timediff.c
+timeval.c
+wait.c
+warnless.c
+cw-out.c
+cw-pause.c
+doh.c
+dynhds.c
+easy.c
+escape.c
+file.c
+fileinfo.c
+formdata.c
+getenv.c
+getinfo.c
+hash.c
+headers.c
+hmac.c
+hostip.c
+hostip6.c
+hsts.c
+http.c
+http1.c
+http_aws_sigv4.c
+http_chunks.c
+http_digest.c
+http_proxy.c
+idn.c
+if2ip.c
+llist.c
+macos.c
+md5.c
+mime.c
+mprintf.c
+mqtt.c
+multi.c
+multi_ev.c
+multi_ntfy.c
+netrc.c
+noproxy.c
+parsedate.c
+progress.c
+rand.c
+ratelimit.c
+request.c
+select.c
+sendf.c
+setopt.c
+sha256.c
+slist.c
+socketpair.c
+socks.c
+splay.c
+strcase.c
+strdup.c
+strequal.c
+strerror.c
+transfer.c
+uint-bset.c
+uint-hash.c
+uint-spbset.c
+uint-table.c
+url.c
+urlapi.c
+digest.c
+vauth.c
+version.c
+curl_ngtcp2.c
+curl_osslq.c
+curl_quiche.c
+vquic-tls.c
+vquic.c
+hostcheck.c
+keylog.c
+vtls.c
+vtls_scache.c
+ws.c
+http_negotiate.c
+curl_sspi.c
+socks_sspi.c
+krb5_sspi.c
+spnego_sspi.c
+vauth.c
+schannel.c
+schannel_verify.c
+x509asn1.c
+bufref.c
+system_win32.c
+digest_sspi.c
+multibyte.c
+version_win32.c
+winapi.c
+cargo:rerun-if-env-changed=AR_x86_64-pc-windows-msvc
+AR_x86_64-pc-windows-msvc = None
+cargo:rerun-if-env-changed=AR_x86_64_pc_windows_msvc
+AR_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=HOST_AR
+HOST_AR = None
+cargo:rerun-if-env-changed=AR
+AR = None
+cargo:rerun-if-env-changed=ARFLAGS
+ARFLAGS = None
+cargo:rerun-if-env-changed=HOST_ARFLAGS
+HOST_ARFLAGS = None
+cargo:rerun-if-env-changed=ARFLAGS_x86_64_pc_windows_msvc
+ARFLAGS_x86_64_pc_windows_msvc = None
+cargo:rerun-if-env-changed=ARFLAGS_x86_64-pc-windows-msvc
+ARFLAGS_x86_64-pc-windows-msvc = None
+Replacing C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\build\curl-sys-1ba5c1ea66f91603\out\build\240958fc840aa3df-vauth.o
+Replacing C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\build\curl-sys-1ba5c1ea66f91603\out\build\53da4157be79b190-bufref.o
+cargo:rustc-link-search=native=C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\atlmfc\lib\x64
+cargo:rustc-link-lib=static=curl
+cargo:rustc-link-search=native=C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\build\curl-sys-1ba5c1ea66f91603\out\build
+cargo:rustc-link-lib=ws2_32
+cargo:rustc-link-lib=crypt32

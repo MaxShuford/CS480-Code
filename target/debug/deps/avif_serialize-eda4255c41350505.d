@@ -1,0 +1,10 @@
+C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\deps\avif_serialize-eda4255c41350505.d: C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\lib.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\boxes.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\constants.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\writer.rs
+
+C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\deps\libavif_serialize-eda4255c41350505.rlib: C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\lib.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\boxes.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\constants.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\writer.rs
+
+C:\Users\MaxSh\Desktop\Coursework\Winter2026\CS480\CS480_Code\CS480-Code\target\debug\deps\libavif_serialize-eda4255c41350505.rmeta: C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\lib.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\boxes.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\constants.rs C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\writer.rs
+
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\lib.rs:
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\boxes.rs:
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\constants.rs:
+C:\Users\MaxSh\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\avif-serialize-0.8.8\src\writer.rs:

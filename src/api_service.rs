@@ -81,14 +81,21 @@ pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> AppResult<
     Ok((lat, lon))
 }
 
-pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> AppResult<DirectionOptions> {
+pub fn directions(api_key: &str, locations: Vec<Waypoint>) -> AppResult<DirectionOptions> {
+
     // construct api call
-    let mut loc_str = format!("{},{}", locations[0].1, locations[0].0);
-    for i in 1..(locations.len()) {
-        loc_str.push_str(&format!(";{},{}", locations[i].1, locations[i].0));
+    let mut loc_str = format!("{},{}", locations[0].longitude, locations[0].latitude);
+
+    for i in 1..locations.len() {
+        loc_str.push_str(&format!(
+            ";{},{}",
+            locations[i].longitude,
+            locations[i].latitude
+        ));
     }
+
     let api_call_str = format!(
-        "https://api.mapbox.com/directions/v5/mapbox/driving/{loc_str}?notifications=none&alternatives=true&steps=true&access_token={api_key}"
+    "https://api.mapbox.com/directions/v5/mapbox/driving/{loc_str}?alternatives=true&steps=true&geometries=polyline&access_token={api_key}"
     );
 
     // execute directions api call
@@ -97,30 +104,36 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> AppResult<Direct
 
     // parsing result json
     let result: APIResult =
-        serde_json::from_str(result_str.as_str()).expect("failed parseing code");
+        serde_json::from_str(result_str.as_str()).expect("failed parsing code");
 
-    // construct usable route data from heavily nested json
+    // construct usable route data
     let mut routes: Vec<RouteWithDirections> = Vec::with_capacity(result.routes.len());
+
     for route in result.routes {
+
+        // preserve waypoint info from input
         let mut waypoints = Vec::new();
-        for i in 0..locations.len() {
+
+        for (i, wp) in locations.iter().enumerate() {
             waypoints.push(Waypoint {
                 id: i as i32,
-                name: "".to_string(),
-                latitude: locations[i].0 as f64,
-                longitude: locations[i].1 as f64,
-            })
+                name: wp.name.clone(),
+                latitude: wp.latitude,
+                longitude: wp.longitude,
+            });
         }
 
+        // collect directions
         let mut directions: Vec<String> = Vec::new();
         for leg in route.legs {
             for step in leg.steps {
                 directions.push(step.maneuver.instruction);
             }
         }
+
         routes.push(RouteWithDirections {
-            waypoints: waypoints,
-            directions: directions,
+            waypoints,
+            directions,
             geometry: route.geometry,
         });
     }
@@ -128,7 +141,7 @@ pub fn directions(api_key: &str, locations: Vec<(f32, f32)>) -> AppResult<Direct
     // return DirectionsResult
     Ok(DirectionOptions {
         code: result.code,
-        routes: routes,
+        routes,
     })
 }
 

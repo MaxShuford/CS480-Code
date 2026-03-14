@@ -113,30 +113,39 @@ function passwordsMatch(password, confirmPassword)
         password - the password of the user
 */
 function login(username, password) {
-    //hash the password
+
     hashString(password).then(hashedPassword => {
-        password = hashedPassword;
-    });
-    
-    //create and send the POST request to the server
-    const postData = { username: username, hashed_pw: password};
-    let userID;
-    fetch('/login', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
-    })
-    .then(response => response.json())
-    .then(data => {
-    console.log('Success:', data);
-    userID = userID;
-    localStorage.setItem('username', username);
-    localStorage.setItem('userID', userID);
-    })
-    .catch((error) => {
-    console.error('Error:', error);
+
+        const postData = { username: username, pw_hash: hashedPassword };
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(postData),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Invalid username or password");
+            }
+            return response.json();
+        })
+        .then(data => {
+
+            console.log("Login success:", data);
+
+            localStorage.setItem("username", username);
+            localStorage.setItem("userID", data.uuid);
+
+            // redirect ONLY after successful login
+            window.location.href = "/html/Waypoints.html";
+        })
+        .catch(error => {
+            console.error(error);
+            alert("Invalid username or password");
+        });
+
     });
 }
 
@@ -146,60 +155,88 @@ function login(username, password) {
         oldPassword - the old password of the user
         newPassword - the new password of the user
 */
-function changePassword(user, oldPassword, newPassword)
-{
-    hashString(oldPassword).then(hashedPassword => {
-        oldPassword = hashedPassword;
+function changePassword(user, oldPassword, newPassword) {
+
+    hashString(oldPassword).then(oldHash => {
+
+        hashString(newPassword).then(newHash => {
+
+            const postData = {
+                uuid: parseInt(user),
+                old_pw: oldHash,
+                new_pw: newHash
+            };
+
+            fetch('/changePassword', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(postData),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Incorrect current password");
+                }
+                return response.text();
+            })
+            .then(data => {
+
+                console.log("Password change success:", data);
+
+                alert("Password changed successfully");
+
+                window.location.href = "/html/Waypoints.html";
+
+            })
+            .catch(error => {
+
+                console.error("Password change error:", error);
+                alert("Incorrect current password");
+
+            });
+
+        });
+
     });
 
-    hashString(newPassword).then(hashedPassword => {
-        newPassword = hashedPassword;
-    });
-    
-    const postData = { userID: user, old_pw: oldPassword, new_pw: newPassword };
-
-    fetch('/changePassword', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
-    })
-    .then(response => response.json())
-    .then(data => {
-    console.log('Success:', data);
-    })
-    .catch((error) => {
-    console.error('Error:', error);
-    });
 }
-
 /*
     Creates an account by sending a POST request to the server with the username and hashed password
     param: username - the username of the user
         password - the password of the user
 */
-function createAccount(username, password) 
+async function createAccount(username, password)
 {
-    hashString(password).then(hashedPassword => {
-        password = hashedPassword;
-    });
+    const hashedPassword = await hashString(password);
 
-    const postData = { username: username, hashed_pw: password };
+    const postData = {
+        username: username,
+        pw_hash: hashedPassword
+    };
 
     fetch('/createAccount', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Account creation failed");
+        }
+        return response.json();
+    })
     .then(data => {
-    console.log('Success:', data);
+        console.log("Account created:", data);
+
+        // automatically log in after account creation
+        login(username, password);
     })
-    .catch((error) => {
-    console.error('Error:', error);
+    .catch(error => {
+        console.error("Create account error:", error);
+        alert("Could not create account");
     });
 }
 

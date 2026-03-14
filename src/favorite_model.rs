@@ -7,62 +7,53 @@ use crate::error::Error::*;
 //function to add favorite route to database
 pub fn add_fav(conn: &mut PooledConn, input: AddFavorite) -> AppResult<i32> {
 
-    //query db for number of routes
+    // count how many routes the user has
     let num_routes: Option<u32> = conn.exec_first(
-        "SELECT COUNT(*) 
-        FROM route 
-        WHERE user_id = :uid;", 
-        params!{
-            "uid" => &input.uuid
+        "SELECT COUNT(*) FROM route WHERE user_id = :uid;",
+        params! {
+            "uid" => input.uuid
         }
     )?;
 
-    //unwrap option, if none, set to 0
     let count = num_routes.unwrap_or(0);
 
-    //check that number of routes < 5
+    // limit to 5 favorites
     if count > 4 {
         return Err(MaxRoutesExceeded);
-    } else {
-        //add route
-        conn.exec_drop(
-            "INSERT INTO route (user_id) 
-            VALUES (:uid);", 
-            params!{
-                "uid" => &input.uuid
-            }
-        )?;
-        
-        //get route id of newly added route
-        let route_id: Option<i32> = conn.exec_first(
-            "SELECT route_id
-            FROM route 
-            WHERE user_id = :uid
-            ORDER BY route_id DESC
-            LIMIT 1;",
-            params!{
-                "uid" => &input.uuid
-            }
-        )?;
-
-        //add each waypoint
-        for wp in &input.wp {
-            conn.exec_drop(
-                "INSERT INTO location (location_id, route_id, `name`, latitude, longitude)
-	            VALUES (:lid, :rid, :name, :lat, :lon);", 
-                params!{
-                    "lid" => &wp.id,
-                    "rid" => &route_id.unwrap_or(0),
-                    "name" => &wp.name,
-                    "lat" => &wp.latitude,
-                    "lon" => &wp.longitude
-                }
-            )?;
-        }
-
-        //return success
-        Ok(1)
     }
+
+    // insert new route
+    conn.exec_drop(
+        "INSERT INTO route (user_id, name) VALUES (:uid, :name);",
+        params! {
+            "uid" => input.uuid,
+            "name" => "Favorite Route"
+        }
+    )?;
+
+    // get new route id
+    let route_id = conn.last_insert_id() as i32;
+
+    println!("Created route {} for user {}", route_id, input.uuid);
+
+    // insert waypoints
+    for wp in &input.wp {
+
+        println!("Inserting waypoint {:?}", wp);
+
+        conn.exec_drop(
+            "INSERT INTO location (route_id, name, latitude, longitude)
+             VALUES (:rid, :name, :lat, :lon);",
+            params! {
+                "rid" => route_id,
+                "name" => &wp.name,
+                "lat" => wp.latitude,
+                "lon" => wp.longitude
+            }
+        )?;
+    }
+
+    Ok(route_id)
 }
 
 //function to delete favorite from database

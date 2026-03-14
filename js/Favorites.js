@@ -1,230 +1,199 @@
 "use strict";
 
-const getFavorites = (ActionEvent) => {
+const loadFavorites = () => {
 
-    const divObject = ActionEvent.target.closest(".favRoute");
+    const postData = {
+        uuid: parseInt(localStorage.getItem("userID"))
+    };
 
-    let idNum = divObject.id;
-
-    console.log(idNum);
-
-    const postData = {uid:localStorage.getItem("userID")};
     fetch('/retrieveFavorites', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
     })
     .then(response => response.json())
     .then(data => {
-    console.log('Success:', data);
-    favorites = data;
-    for(let i = 0; i < favorites.names.length; i++)
-    {
-        createFavorite(favorites.name[i], favorites.route_id[i]);
-    }
+
+        console.log("Favorites loaded:", data);
+
+        const list = document.querySelector("#favorites ul");
+
+        // destroy accordion so DOM updates correctly
+        $("#accordion").accordion("destroy");
+
+        list.innerHTML = "";
+
+        const favorites = data.favorites;
+
+        for (let i = 0; i < favorites.length; i++) {
+            createFavorite(favorites[i].name, favorites[i].route_id);
+        }
+
+        // rebuild accordion
+        $("#accordion").accordion({
+            collapsible: true,
+            active: false
+        });
+
     })
-    .catch((error) => {
-    console.error('Error:', error);
-    });
-}
+    .catch(error => console.error(error));
+};
 
 const getFavorite = (Event) => {
-    const postData = {uid:localStorage.getItem("userID"), route_id:Event.target.id};
-     fetch('/retrieveFavorite', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+
+    const postData = {
+        uuid: parseInt(localStorage.getItem("userID")),
+        route_id: parseInt(Event.target.id)
+    };
+
+    fetch('/retrieveFavorite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
     })
     .then(response => response.json())
     .then(data => {
-    console.log('Success:', data);
-    for(let i = 0; i < data.waypoints.length; i++)
-    {
-        const wpcity = data.waypoints[i];
-        const wpSplit = wpCity.split(", ");
-        console.log(wpSplit);
-        const postData = {city:wpSplit[0], state:wpSplit[1]};
-        fetch('/locationData', {
-                method: 'POST', // Specify the method
-                headers: {
-                    'Content-Type': 'application/json', // Inform the server the body is JSON
-                },
-                body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Success:', data);
-                    waypointOBJ[i] = data;
-                    waypointOBJ[i].id = i;
-                    console.log(waypointOBJ[i]);
-                    console.log("i: ", i, "num:", allWaypoints.length);
-                    if(i == data.waypoints.length-1)
-                    {
-                        localStorage.setItem("start", waypointOBJ[0].name);
-                        localStorage.setItem("destination", waypointOBJ[allWaypoints.length-1].name)
-                        //get the directions for the routes
-                        const postData = waypointOBJ;
-                        console.log("post data:", postData);
-                        fetch('/directions', {
-                        method: 'POST', // Specify the method
-                        headers: {
-                            'Content-Type': 'application/json', // Inform the server the body is JSON
-                        },
-                        body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                        console.log('Success:', data);
+
+        console.log('Success:', data);
+
+        const routeLength = data.wp.length;
+        let waypointOBJ = [];
+        let completed = 0;
+
+        for(let i = 0; i < routeLength; i++)
+        {
+            const wpcity = data.wp[i].name;
+            const wpSplit = wpcity.split(", ");
+
+            const postData = {city:wpSplit[0], state:wpSplit[1]};
+
+            fetch('/locationData', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(locData => {
+
+                waypointOBJ[i] = locData;
+                waypointOBJ[i].id = i;
+                waypointOBJ[i].name = wpcity;
+
+                completed++;
+
+                if(completed === routeLength)
+                {
+                    localStorage.setItem("start", waypointOBJ[0].name);
+                    localStorage.setItem("destination", waypointOBJ[routeLength-1].name);
+
+                    fetch('/directions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(waypointOBJ)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+
                         localStorage.setItem("routes", JSON.stringify(data.routes));
-                        console.log("saved route", data.routes);
-                        window.location.href ="/html/Route.html";
-                        })
-                        .catch((error) => {
-                        console.error('Error:', error);
-                        });
-                    }
-                })
-                .catch((error) => {
-                console.error('Error:', error);
-                });
+                        window.location.href = "/html/Route.html";
+
+                    });
+                }
+            });
         }
-        })
-        .catch((error) => {
-        console.error('Error:', error);
-        });
-}
+
+    });
+};
 
 const removeFavorite = (ActionEvent) => {
 
-    console.log(ActionEvent.value);
+    const routeDiv = ActionEvent.target.closest(".favRoute");
+    const routeID = parseInt(routeDiv.id);
 
-    const postData = {uid:localStorage.getItem("userID"), route_id:ActionEvent.target.id};
+    const postData = {
+        uuid: parseInt(localStorage.getItem("userID")),
+        route_id: routeID
+    };
 
-    fetch('/delFavorite', {
-    method: 'POST', // Specify the method
-    headers: {
-        'Content-Type': 'application/json', // Inform the server the body is JSON
-    },
-    body: JSON.stringify(postData), // Convert the JavaScript object to a JSON string
+    fetch('/deleteFavorite', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData),
     })
     .then(response => response.json())
     .then(data => {
-    console.log('Success:', data);
-    getFavorites()
+
+        console.log('Success:', data);
+
+        // remove item from UI immediately
+        routeDiv.parentElement.remove();
+
     })
     .catch((error) => {
-    console.error('Error:', error);
+        console.error('Error:', error);
     });
-}
-
-
-/*
-
-<li>
-                                <div class="favRoute" id="1">
-
-                                    <div class="FavPartOne">
-                                        <span>City A</span>
-
-                                        <img src="../css/Images/ArrowIcon.png" alt="LeftArrow" class="arrow">
-
-                                        <span>City B</span>
-                                    </div>
-
-                                    <div class="FavPartTwo">
-                                        <a><img src="../css/Images/TrashIcon.png" alt="Trash" class="trash"></a>
-
-                                        <input type="button" value="GO" class="button" id="FavRoute">
-                                    </div>
-                                </div>
-                            </li>
-
-
-
-*/
+};
 
 const createFavorite = (name, routeID) => {
 
     console.log("Creating Favorite to list");
 
-    let currentID = 0;
+    const listOfFavorite = document.querySelector("#favorites ul");
 
-    //Get the UL
-    const listOfFavorite = $$("#favorites").firstElementChild;
+    const listItem = document.createElement("li");
 
-    //Create li element
-    const listItem = document.createElement("li")
-
-    //Create a new fulldiv element
     const fullDiv = document.createElement("div");
     fullDiv.classList.add("favRoute");
-    fullDiv.id = currentID;
+    fullDiv.id = routeID;
 
-    //Create FirstHalf
     const firstHalfDiv = document.createElement("div");
     firstHalfDiv.classList.add("FavPartOne");
 
-    //StartCity and set to child of firstHalf
+    const routeParts = name.split("-");
+
     const startCity = document.createElement("span");
-    startCity.textContent = name;
+    startCity.textContent = routeParts[0];
     firstHalfDiv.appendChild(startCity);
 
-    //Create a new arrow img element and set as child of firstHalf
     const arrowImg = document.createElement("img");
     arrowImg.classList.add("arrow");
     arrowImg.src = "../css/Images/ArrowIcon.png";
     arrowImg.alt = "RightArrow";
     firstHalfDiv.appendChild(arrowImg);
 
-    //EndCity and set to child of firstHalf
     const endCity = document.createElement("span");
-    endCity.textContent = name;
+    endCity.textContent = routeParts[1];
     firstHalfDiv.appendChild(endCity);
 
-    //Create SecondHalf
     const secondHalfDiv = document.createElement("div");
     secondHalfDiv.classList.add("FavPartTwo");
 
-    //Create a new trash img element and set as child of secondHalf
     const trashImg = document.createElement("img");
     trashImg.classList.add("trash");
     trashImg.src = "../css/Images/TrashIcon.png";
     trashImg.alt = "Trash";
+    trashImg.addEventListener("click", removeFavorite);
     secondHalfDiv.appendChild(trashImg);
 
-    //Create GO button then set as child in secondHalf
     const goButton = document.createElement("input");
     goButton.type = "button";
     goButton.value = "GO";
     goButton.classList.add("buttons");
-    fullDiv.id = "FavRoute";
-    secondHalfDiv.appendChild(goButton)
+    goButton.id = routeID;
+    goButton.addEventListener("click", getFavorite);
+    secondHalfDiv.appendChild(goButton);
 
-    //Put halfs to full DIv
     fullDiv.appendChild(firstHalfDiv);
     fullDiv.appendChild(secondHalfDiv);
 
-    //Put div to li
     listItem.appendChild(fullDiv);
-
-    //Put li to Ul
     listOfFavorite.appendChild(listItem);
-}
+};
 
-//DomContentLoaded
-/*
-document.addEventListener("DOMContentLoaded", () =>{
-    //Get all the add and trash buttons and give them their function.
-    const allAddButtons = document.querySelectorAll("#FavRoute");
-    const allTrashButtons = document.querySelectorAll(".trash")
-    document.querySelector(#accordion).getFavorites();
-    for(let i = 0; i < allAddButtons.length; i++){
-        allAddButtons[i].addEventListener("click", getFavorite);
-        allTrashButtons[i].addEventListener("click", removeFavorite);
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    loadFavorites();
 });
-*/

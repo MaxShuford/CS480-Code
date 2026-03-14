@@ -4,7 +4,7 @@ echo Building Rust project...
 cargo build
 
 echo Starting server
-start cmd /k cargo run
+start cmd /k cargo run --release
 
 echo Waiting for server to start
 timeout /t 3 >nul

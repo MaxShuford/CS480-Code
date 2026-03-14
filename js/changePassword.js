@@ -1,32 +1,35 @@
-"USE STRICT";
+"use strict";
 
 const $ = selector => document.querySelector(selector);
 
 document.addEventListener("DOMContentLoaded", () => {
-    $("[type=button]").addEventListener("click", event => {
-        event.preventDefault();
-        const oldPassword = $("[name=oldPassword]");
-        const newPassword = $("[name=newPassword]");
-        const confirmPassword = $("[name=confirmPassword]");
-        let validOldPassword = validatePassword(oldPassword, 0);  
-        let validNewPassword = validatePassword(newPassword, 0);
-        let validConfirmPassword = passwordsMatch(newPassword, confirmPassword);
-        if(validOldPassword && validNewPassword && validConfirmPassword)
-        {
-            changePassword(localStorage.getItem("userID"), oldPassword.value, newPassword.value);
-            window.location.href = "/html/Waypoints.html";
-        }
-    });
 
-    $(".backButton").addEventListener("click", backToWP);
+    const changeBtn = document.querySelector("input[type=button]");
+
+    changeBtn.addEventListener("click", event => {
+
+    event.preventDefault();
+
+    const oldPassword = $("[name=oldPassword]").value;
+    const newPassword = $("[name=newPassword]").value;
+    const confirmPassword = $("[name=confirmPassword]").value;
+
+    if(newPassword !== confirmPassword){
+        alert("Passwords do not match");
+        return;
+    }
+
+    const uuid = localStorage.getItem("userID");
+
+    changePassword(uuid, oldPassword, newPassword);
 });
 
-//Back to home button PROTOTYPE
-const backToWP = () => {
 
-    //What data should be brought back to Waypoints?
+    const backButton = document.querySelector(".backButton");
+    if(backButton){
+        backButton.addEventListener("click", () => {
+            window.location.href = "/html/Waypoints.html";
+        });
+    }
 
-
-    location.href = "/html/Waypoints.html";
-}
-
+});

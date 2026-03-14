@@ -12,6 +12,7 @@ pub enum Error {
     LoginFailed { username: String },
     UserExists { username: String },
     IncorrectPassword,
+    DatabaseError,
 
     // -- favorite model errors
     MaxRoutesExceeded,

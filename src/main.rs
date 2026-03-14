@@ -2,10 +2,11 @@ mod api_service;
 mod error;
 mod routes;
 pub mod structs;
-
 mod user_model;
+mod favorite_model;
 
-use crate::error::Error::LoginFailed;
+use error::Error::*;
+use mysql::*;
 
 use std::{
     fs,
@@ -203,8 +204,8 @@ fn handle_stream(mut stream: TcpStream, api_keys: &structs::APIKeys) {
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     } else if &request_line[..] == "GET /css/Images/UserIcon.png HTTP/1.1" {
@@ -214,8 +215,8 @@ Content-Length: {length}\r\n\r\n"};
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     } else if &request_line[..] == "GET /css/Images/ArrowIcon.png HTTP/1.1" {
@@ -225,8 +226,8 @@ Content-Length: {length}\r\n\r\n"};
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     } else if &request_line[..] == "GET /css/Images/BackIcon.png HTTP/1.1" {
@@ -236,8 +237,8 @@ Content-Length: {length}\r\n\r\n"};
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     } else if &request_line[..] == "GET /css/Images/TrashIcon.png HTTP/1.1" {
@@ -247,8 +248,8 @@ Content-Length: {length}\r\n\r\n"};
         let response = format! {"HTTP/1.1 200 OK
 Content-Type: {content_type}
 Content-Length: {length}\r\n\r\n"};
-        stream.write(response.as_bytes()).unwrap();
-        stream.write(&contents).unwrap();
+        stream.write_all(response.as_bytes()).unwrap();
+        stream.write_all(&contents).unwrap();
         stream.flush().unwrap();
         return;
     }
@@ -280,6 +281,11 @@ fn handle_request(
         None => (String::from(request_line.trim_end()), String::from("")),
     };
     println!("Request Code: {request_code}, File_name: {file_name}");
+
+    let url = "mysql://root:root@localhost:3306/mooglegaps";
+    // TODO: Test dbc connecter with db
+    let pool = Pool::new(url).expect("Failed to create database pool");
+    let mut conn = pool.get_conn().expect("Failed to get database connection");
 
     let (status_code, content_type, body) = match &request_code[..] {
         // Initial page request
@@ -375,10 +381,6 @@ fn handle_request(
         "POST /directions HTTP/1.1" => {
             let waypoints: Vec<structs::Waypoint> =
                 serde_json::from_str(body_content).expect("invalid waypoint json file");
-            let waypoints: Vec<(f32, f32)> = waypoints
-                .iter()
-                .map(|s| (s.latitude as f32, s.longitude as f32))
-                .collect();
 
             let response = match api_service::directions(api_keys.mapbox.as_str(), waypoints) {
                 Ok(routes) => (
@@ -445,11 +447,12 @@ fn handle_request(
             response
         }
 
-        // TODO: login handle
+        // TODO: handle login with db
+        // login handle
         "POST /login HTTP/1.1" => {
             let credentials: structs::User =
                 serde_json::from_str(body_content).expect("Invalid login credentials json");
-            let response = match user_model::login(credentials) {
+            let response = match user_model::login(&mut conn, credentials) {
                 Ok(uuid) => (
                     "HTTP/1.1 200 Ok",
                     "application/json",
@@ -470,12 +473,158 @@ fn handle_request(
             };
             response
         }
-        // TODO: create account handle
+        // TODO: test create account with db
+        
+            // create account handle
+            "POST /createAccount HTTP/1.1" => {
+                let credentials: structs::User = serde_json::from_str(body_content)
+                    .expect("Invalid create account credentials json");
+                let response = match user_model::create_account(&mut conn, credentials) {
+                    Ok(uuid) => (
+                        "HTTP/1.1 200 Ok",
+                        "application/json",
+                        String::from(format!("{{\"uuid\":{}}}", uuid)),
+                    ),
+                    Err(UserExists {
+                        username: err_string,
+                    }) => (
+                        "HTTP/1.1 400 Bad Request",
+                        "text/plain",
+                        String::from(format!("{err_string} already exists.")),
+                    ),
+                    Err(_) => (
+                        "HTTP/1.1 500 Internal Server Error",
+                        "text/plain",
+                        String::from("An error occurred during account creation"),
+                    ),
+                };
+                response
+            }
+            
         // TODO: change password handle
-        // TODO: add favorite handle
-        // TODO: delete favorite handle
-        // TODO: retrieve favorites handle
-        // TODO: retrieve favorite handle
+        
+        "POST /changePassword HTTP/1.1" => {
+            let credentials: structs::ChangePassword = serde_json::from_str(body_content)
+                .expect("Invalid change password credentials json");
+            let response = match user_model::change_pass(&mut conn, credentials) {
+                Ok(uid) => (
+                    "HTTP/1.1 200 Ok",
+                    "text/plain",
+                    String::from("Password changed successfully"),
+                ),
+                Err(IncorrectPassword) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    "Incorrect current password".to_string(),
+                ),
+                Err(_) => (
+                    "HTTP/1.1 500 Internal Server Error",
+                    "text/plain",
+                    String::from("An error occurred during password change"),
+                ),
+            };
+            response
+        }
+        
+        // TODO: favorite handle with db test
+        
+        "POST /addToFavorite HTTP/1.1" => {
+            let favorite: structs::AddFavorite =
+                serde_json::from_str(body_content).expect("Invalid add favorite json");
+            let response = match favorite_model::add_fav(&mut conn, favorite) {
+                Ok(_) => (
+                    "HTTP/1.1 200 Ok",
+                    "text/plain",
+                    String::from("Favorite added successfully"),
+                ),
+                Err(MaxRoutesExceeded) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    String::from("Maximum number of favorite routes exceeded"),
+                ),
+                Err(e) => {
+                    println!("ADD FAVORITE ERROR: {:?}", e);
+                    (
+                        "HTTP/1.1 500 Internal Server Error",
+                        "text/plain",
+                        String::from("An error occurred while adding favorite"),
+                    )
+                }
+            };
+            response
+        }
+        
+        // TODO: delete favorite handle testing with db
+        
+        "POST /deleteFavorite HTTP/1.1" => {
+            let favorite: structs::DeleteFavorite =
+                serde_json::from_str(body_content).expect("Invalid delete favorite json");
+            let response = match favorite_model::delete_fav(&mut conn, favorite) {
+                Ok(_) => (
+                    "HTTP/1.1 200 Ok",
+                    "text/plain",
+                    String::from("Favorite deleted successfully"),
+                ),
+                Err(DeleteUnsuccessful) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    String::from("Unable to delete favorite route"),
+                ),
+                Err(_) => (
+                    "HTTP/1.1 500 Internal Server Error",
+                    "text/plain",
+                    String::from("An error occurred while deleting favorite"),
+                ),
+            };
+            response
+        }
+        
+        // TODO: retrieve favorites with db testing
+        
+        "POST /retrieveFavorites HTTP/1.1" => {
+            let request: structs::RetrieveFavorites =
+                serde_json::from_str(body_content).expect("Invalid retrieve favorites json");
+            let response = match favorite_model::get_favorites(&mut conn, request) {
+                Ok(favorites) => (
+                    "HTTP/1.1 200 Ok",
+                    "application/json",
+                    serde_json::to_string(&structs::FavoritesList { favorites })
+                        .expect("Failed to serialize favorites"),
+                ),
+                Err(_) => (
+                    "HTTP/1.1 500 Internal Server Error",
+                    "text/plain",
+                    String::from("An error occurred while retrieving favorites"),
+                ),
+            };
+            response
+        }
+        
+        // TODO: retrieve favorite with db testing
+        
+        "POST /retrieveFavorite HTTP/1.1" => {
+            let request: structs::Favorite =
+                serde_json::from_str(body_content).expect("Invalid retrieve favorite json");
+            let response = match favorite_model::get_favorite(&mut conn, request) {
+                Ok(route) => (
+                    "HTTP/1.1 200 Ok",
+                    "application/json",
+                    serde_json::to_string(&route).expect("Failed to serialize route"),
+                ),
+                Err(RouteNotFound) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    String::from("Favorite route not found"),
+                ),
+                Err(_) => (
+                    "HTTP/1.1 500 Internal Server Error",
+                    "text/plain",
+                    String::from("An error occurred while retrieving favorite route"),
+                ),
+            };
+            response
+        }
+        
         _ => (
             "HTTP/1.1 404 Not Found",
             "text/plain",
