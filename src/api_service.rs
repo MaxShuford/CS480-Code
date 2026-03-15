@@ -82,20 +82,18 @@ pub fn geocoding(api_key: &str, city_name: &str, state_code: &str) -> AppResult<
 }
 
 pub fn directions(api_key: &str, locations: Vec<Waypoint>) -> AppResult<DirectionOptions> {
-
     // construct api call
     let mut loc_str = format!("{},{}", locations[0].longitude, locations[0].latitude);
 
     for i in 1..locations.len() {
         loc_str.push_str(&format!(
             ";{},{}",
-            locations[i].longitude,
-            locations[i].latitude
+            locations[i].longitude, locations[i].latitude
         ));
     }
 
     let api_call_str = format!(
-    "https://api.mapbox.com/directions/v5/mapbox/driving/{loc_str}?alternatives=true&steps=true&geometries=polyline&access_token={api_key}"
+        "https://api.mapbox.com/directions/v5/mapbox/driving/{loc_str}?alternatives=true&steps=true&geometries=polyline&access_token={api_key}"
     );
 
     // execute directions api call
@@ -103,14 +101,12 @@ pub fn directions(api_key: &str, locations: Vec<Waypoint>) -> AppResult<Directio
     let result_str = String::from_utf8(result_vec).expect("Did not receive valid UTF-8");
 
     // parsing result json
-    let result: APIResult =
-        serde_json::from_str(result_str.as_str()).expect("failed parsing code");
+    let result: APIResult = serde_json::from_str(result_str.as_str()).expect("failed parsing code");
 
     // construct usable route data
     let mut routes: Vec<RouteWithDirections> = Vec::with_capacity(result.routes.len());
 
     for route in result.routes {
-
         // preserve waypoint info from input
         let mut waypoints = Vec::new();
 

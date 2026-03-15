@@ -1,9 +1,9 @@
 mod api_service;
 mod error;
+mod favorite_model;
 mod routes;
 pub mod structs;
 mod user_model;
-mod favorite_model;
 
 use error::Error::*;
 use mysql::*;
@@ -474,35 +474,34 @@ fn handle_request(
             response
         }
         // TODO: test create account with db
-        
-            // create account handle
-            "POST /createAccount HTTP/1.1" => {
-                let credentials: structs::User = serde_json::from_str(body_content)
-                    .expect("Invalid create account credentials json");
-                let response = match user_model::create_account(&mut conn, credentials) {
-                    Ok(uuid) => (
-                        "HTTP/1.1 200 Ok",
-                        "application/json",
-                        String::from(format!("{{\"uuid\":{}}}", uuid)),
-                    ),
-                    Err(UserExists {
-                        username: err_string,
-                    }) => (
-                        "HTTP/1.1 400 Bad Request",
-                        "text/plain",
-                        String::from(format!("{err_string} already exists.")),
-                    ),
-                    Err(_) => (
-                        "HTTP/1.1 500 Internal Server Error",
-                        "text/plain",
-                        String::from("An error occurred during account creation"),
-                    ),
-                };
-                response
-            }
-            
+
+        // create account handle
+        "POST /createAccount HTTP/1.1" => {
+            let credentials: structs::User = serde_json::from_str(body_content)
+                .expect("Invalid create account credentials json");
+            let response = match user_model::create_account(&mut conn, credentials) {
+                Ok(uuid) => (
+                    "HTTP/1.1 200 Ok",
+                    "application/json",
+                    String::from(format!("{{\"uuid\":{}}}", uuid)),
+                ),
+                Err(UserExists {
+                    username: err_string,
+                }) => (
+                    "HTTP/1.1 400 Bad Request",
+                    "text/plain",
+                    String::from(format!("{err_string} already exists.")),
+                ),
+                Err(_) => (
+                    "HTTP/1.1 500 Internal Server Error",
+                    "text/plain",
+                    String::from("An error occurred during account creation"),
+                ),
+            };
+            response
+        }
+
         // TODO: change password handle
-        
         "POST /changePassword HTTP/1.1" => {
             let credentials: structs::ChangePassword = serde_json::from_str(body_content)
                 .expect("Invalid change password credentials json");
@@ -525,9 +524,8 @@ fn handle_request(
             };
             response
         }
-        
+
         // TODO: favorite handle with db test
-        
         "POST /addToFavorite HTTP/1.1" => {
             let favorite: structs::AddFavorite =
                 serde_json::from_str(body_content).expect("Invalid add favorite json");
@@ -553,9 +551,8 @@ fn handle_request(
             };
             response
         }
-        
+
         // TODO: delete favorite handle testing with db
-        
         "POST /deleteFavorite HTTP/1.1" => {
             let favorite: structs::DeleteFavorite =
                 serde_json::from_str(body_content).expect("Invalid delete favorite json");
@@ -578,9 +575,8 @@ fn handle_request(
             };
             response
         }
-        
+
         // TODO: retrieve favorites with db testing
-        
         "POST /retrieveFavorites HTTP/1.1" => {
             let request: structs::RetrieveFavorites =
                 serde_json::from_str(body_content).expect("Invalid retrieve favorites json");
@@ -599,9 +595,8 @@ fn handle_request(
             };
             response
         }
-        
+
         // TODO: retrieve favorite with db testing
-        
         "POST /retrieveFavorite HTTP/1.1" => {
             let request: structs::Favorite =
                 serde_json::from_str(body_content).expect("Invalid retrieve favorite json");
@@ -624,7 +619,7 @@ fn handle_request(
             };
             response
         }
-        
+
         _ => (
             "HTTP/1.1 404 Not Found",
             "text/plain",

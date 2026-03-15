@@ -1,18 +1,17 @@
-use mysql::*;
-use mysql::prelude::*;
-use crate::structs::*;
 use crate::error::AppResult;
 use crate::error::Error::*;
+use crate::structs::*;
+use mysql::prelude::*;
+use mysql::*;
 
 //function to add favorite route to database
 pub fn add_fav(conn: &mut PooledConn, input: AddFavorite) -> AppResult<i32> {
-
     // count how many routes the user has
     let num_routes: Option<u32> = conn.exec_first(
         "SELECT COUNT(*) FROM route WHERE user_id = :uid;",
         params! {
             "uid" => input.uuid
-        }
+        },
     )?;
 
     let count = num_routes.unwrap_or(0);
@@ -28,7 +27,7 @@ pub fn add_fav(conn: &mut PooledConn, input: AddFavorite) -> AppResult<i32> {
         params! {
             "uid" => input.uuid,
             "name" => "Favorite Route"
-        }
+        },
     )?;
 
     // get new route id
@@ -38,18 +37,18 @@ pub fn add_fav(conn: &mut PooledConn, input: AddFavorite) -> AppResult<i32> {
 
     // insert waypoints
     for wp in &input.wp {
-
         println!("Inserting waypoint {:?}", wp);
 
         conn.exec_drop(
-            "INSERT INTO location (route_id, name, latitude, longitude)
-             VALUES (:rid, :name, :lat, :lon);",
+            "INSERT INTO location (location_id, route_id, name, latitude, longitude)
+             VALUES (:lid, :rid, :name, :lat, :lon);",
             params! {
+                "lid" => wp.id,
                 "rid" => route_id,
                 "name" => &wp.name,
                 "lat" => wp.latitude,
                 "lon" => wp.longitude
-            }
+            },
         )?;
     }
 
@@ -58,14 +57,13 @@ pub fn add_fav(conn: &mut PooledConn, input: AddFavorite) -> AppResult<i32> {
 
 //function to delete favorite from database
 pub fn delete_fav(conn: &mut PooledConn, input: DeleteFavorite) -> AppResult<i32> {
-
     //delete waypoints
     conn.exec_drop(
         "DELETE FROM location 
         WHERE route_id = :rid;",
-        params!{
+        params! {
             "rid" => &input.route_id
-        }
+        },
     )?;
 
     //delete from route table
@@ -73,12 +71,12 @@ pub fn delete_fav(conn: &mut PooledConn, input: DeleteFavorite) -> AppResult<i32
         "DELETE FROM route 
         WHERE user_id = :uid
         AND route_id = :rid;",
-        params!{
+        params! {
             "uid" => &input.uuid,
             "rid" => &input.route_id
-        }
+        },
     )?;
-    
+
     //check that the route was deleted
     if conn.affected_rows() > 0 {
         Ok(1)
@@ -88,8 +86,10 @@ pub fn delete_fav(conn: &mut PooledConn, input: DeleteFavorite) -> AppResult<i32
 }
 
 //function to get user's favorite routes
-pub fn get_favorites(conn: &mut PooledConn, input: RetrieveFavorites) -> AppResult<Vec<FavoriteReturn>> {
-
+pub fn get_favorites(
+    conn: &mut PooledConn,
+    input: RetrieveFavorites,
+) -> AppResult<Vec<FavoriteReturn>> {
     //query db for user's favorites
     let favs: Vec<FavoriteReturn> = conn.exec_map(
         //crazy select statement to get route id and start and end location names
@@ -105,39 +105,36 @@ pub fn get_favorites(conn: &mut PooledConn, input: RetrieveFavorites) -> AppResu
         params! {
             "uuid" => &input.uuid
         },
-
         //map each row to a FavoriteReturn struct
-        |(route_id, start_name, end_name) : (i32, Option<String>, Option<String>)| {
+        |(route_id, start_name, end_name): (i32, Option<String>, Option<String>)| {
             //unpack options, if none, set to "Unknown"
             let start = start_name.unwrap_or_else(|| String::from("Unknown"));
-            let end = end_name.unwrap_or_else(|| String::from("Unknown")); 
+            let end = end_name.unwrap_or_else(|| String::from("Unknown"));
 
             //create FavoriteReturn struct
             FavoriteReturn {
                 name: format!("{}-{}", start, end),
                 route_id,
             }
-        }
+        },
     )?;
 
     //return favorites
     Ok(favs)
 }
-    
 
 //function to get a route from the user's favorites
 pub fn get_favorite(conn: &mut PooledConn, input: Favorite) -> AppResult<Route> {
-
     //try to retrieve the route from the database
     let route_exists: Option<i32> = conn.exec_first(
         "SELECT route_id 
         FROM route 
         WHERE user_id = :uid 
         AND route_id = :rid;",
-        params!{
+        params! {
             "uid" => &input.uuid,
             "rid" => &input.route_id
-        }
+        },
     )?;
 
     //if the route doesn't exist, return an error
@@ -149,24 +146,21 @@ pub fn get_favorite(conn: &mut PooledConn, input: Favorite) -> AppResult<Route> 
     let wp: Vec<Waypoint> = conn.exec_map(
         "SELECT location_id, name, latitude, longitude
         FROM location 
-        WHERE route_id = :rid;", 
-        params!{
+        WHERE route_id = :rid;",
+        params! {
             "rid" => &input.route_id
         },
-
         //map each row to a Waypoint struct
-        |(id, name, latitude, longitude)|{
-            Waypoint{
-                id,
-                name,
-                latitude,
-                longitude,
-            }
-        }
+        |(id, name, latitude, longitude)| Waypoint {
+            id,
+            name,
+            latitude,
+            longitude,
+        },
     )?;
 
     //create route struct
-    let route = Route{
+    let route = Route {
         route_id: input.route_id,
         wp: wp,
     };
